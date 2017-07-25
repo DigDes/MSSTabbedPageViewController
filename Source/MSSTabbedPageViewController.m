@@ -28,62 +28,26 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-
-    self.provideOutOfBoundsUpdates = NO;
+    MSSTabBarView *tabBarView = [[MSSTabBarView alloc] init];
+    self.tabBarView = tabBarView;
+    self.pageViewController = [[MSSPageViewController alloc] init];
+    self.pageViewController.provideOutOfBoundsUpdates = NO;
+    self.automaticallyAdjustsScrollViewInsets = NO;
 }
 
-#if !defined(MSS_APP_EXTENSIONS)
-- (void)viewWillAppear:(BOOL)animated {
-    [super viewWillAppear:animated];
-    
-    // set up navigation bar for tabbed page view if available
-    if ([self.navigationController.navigationBar isMemberOfClass:[MSSTabNavigationBar class]] && !self.tabBarView) {
-        MSSTabNavigationBar *navigationBar = (MSSTabNavigationBar *)self.navigationController.navigationBar;
-        self.navigationController.delegate = self;
-        _tabNavigationBar = navigationBar;
+- (void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator {
+    [super viewWillTransitionToSize:size withTransitionCoordinator:coordinator];
+    [coordinator animateAlongsideTransitionInView:self.tabBarView animation:^(id<UIViewControllerTransitionCoordinatorContext>  _Nonnull context) {
         
-        MSSTabBarView *tabBarView = navigationBar.tabBarView;
-        tabBarView.dataSource = self;
-        tabBarView.delegate = self;
-        self.tabBarView = tabBarView;
-        self.tabBarView.hidden = NO;
-        
-        BOOL isInitialController = (self.navigationController.viewControllers.firstObject == self);
-        [navigationBar tabbedPageViewController:self viewWillAppear:animated isInitial:isInitialController];
-    }
-}
-
-- (void)viewWillDisappear:(BOOL)animated {
-    [super viewWillDisappear:animated];
-    
-    if (self.tabNavigationBar && (self.tabBarView == self.tabNavigationBar.tabBarView)) {
-        
-        // if next view controller is not tabbed page view controller update navigation bar
-        self.allowTabBarRequiredCancellation = ![self.navigationController.visibleViewController isKindOfClass:[MSSTabbedPageViewController class]];
-        if (self.allowTabBarRequiredCancellation) {
-            [self.tabNavigationBar tabbedPageViewController:self viewWillDisappear:animated];
-        }
-        
-        // remove the current tab bar
-        self.tabBarView.hidden = YES;
-        self.tabBarView = nil;
-    }
-}
-#endif
-
-#pragma mark - Public
-
-- (void)setDelegate:(id<MSSPageViewControllerDelegate>)delegate {
-    // only allow self to be page view controller delegate
-    if (delegate == (id<MSSPageViewControllerDelegate>)self) {
-        [super setDelegate:delegate];
-    }
+    } completion:^(id<UIViewControllerTransitionCoordinatorContext>  _Nonnull context) {
+        [self.tabBarView setTabOffset:self.tabBarView.tabOffset];
+    }];
 }
 
 #pragma mark - Tab bar data source
 
 - (NSInteger)numberOfItemsForTabBarView:(MSSTabBarView *)tabBarView {
-    return self.viewControllers.count;
+    return self.pageViewController.viewControllers.count;
 }
 
 - (void)tabBarView:(MSSTabBarView *)tabBarView
@@ -93,26 +57,26 @@
 }
 
 - (NSInteger)defaultTabIndexForTabBarView:(MSSTabBarView *)tabBarView {
-    if (self.currentPage == MSSPageViewControllerPageNumberInvalid) { // return default page if page has not been moved
-        return self.defaultPageIndex;
+    if (self.pageViewController.currentPage == MSSPageViewControllerPageNumberInvalid) { // return default page if page has not been moved
+        return self.pageViewController.defaultPageIndex;
     }
-    return self.currentPage;
+    return self.pageViewController.currentPage;
 }
 
 #pragma mark - Tab bar delegate
 
 - (void)tabBarView:(MSSTabBarView *)tabBarView tabSelectedAtIndex:(NSInteger)index {
-    if (index != self.currentPage && !self.isAnimatingPageUpdate && index < self.viewControllers.count) {
-        self.allowScrollViewUpdates = NO;
-        self.userInteractionEnabled = NO;
+    if (index != self.pageViewController.currentPage && !self.pageViewController.isAnimatingPageUpdate && index < self.pageViewController.viewControllers.count) {
+        self.pageViewController.allowScrollViewUpdates = NO;
+        self.pageViewController.userInteractionEnabled = NO;
         
         [self.tabBarView setTabIndex:index animated:YES];
         typeof(self) __weak weakSelf = self;
-        [self moveToPageAtIndex:index
+        [self.pageViewController moveToPageAtIndex:index
                      completion:^(UIViewController *newViewController, BOOL animated, BOOL transitionFinished) {
                          typeof(weakSelf) __strong strongSelf = weakSelf;
-                         strongSelf.allowScrollViewUpdates = YES;
-                         strongSelf.userInteractionEnabled = YES;
+                         strongSelf.pageViewController.allowScrollViewUpdates = YES;
+                         strongSelf.pageViewController.userInteractionEnabled = YES;
                      }];
     }
 }
@@ -133,12 +97,9 @@
 
 - (void)pageViewController:(MSSPageViewController *)pageViewController
            didScrollToPage:(NSInteger)page {
-    
-    if (!self.isDragging) {
-        self.tabBarView.userInteractionEnabled = YES;
-    }
-    self.allowScrollViewUpdates = YES;
-    self.userInteractionEnabled = YES;
+    self.pageViewController.allowScrollViewUpdates = YES;
+    self.pageViewController.userInteractionEnabled = YES;
+    self.tabBarView.userInteractionEnabled = YES;
 }
 
 #pragma mark - Navigation Controller delegate
@@ -159,22 +120,5 @@
     }];
 }
 #endif
-
-#pragma mark - Scroll View delegate
-
-- (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView {
-    [super scrollViewWillBeginDragging:scrollView];
-    self.tabBarView.userInteractionEnabled = NO;
-}
-
-- (void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate {
-    if (!decelerate) {
-        self.tabBarView.userInteractionEnabled = YES;
-    }
-}
-
-- (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView {
-    self.tabBarView.userInteractionEnabled = YES;
-}
 
 @end

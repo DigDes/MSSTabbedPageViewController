@@ -11,6 +11,10 @@
 
 @interface MSSTabBarCollectionViewCell : UICollectionViewCell
 
+/* A stack with a horizontal axis is a row of arrangedSubviews,
+ and a stack with a vertical axis is a column of arrangedSubviews.
+ */
+@property (nonatomic) UILayoutConstraintAxis axis UI_APPEARANCE_SELECTOR;
 /**
  The style of the tab.
  */

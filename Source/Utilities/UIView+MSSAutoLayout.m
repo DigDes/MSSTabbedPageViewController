@@ -13,7 +13,7 @@ NSInteger const MSSViewDefaultZIndex = -1;
 @implementation UIView (MSSAutoLayout)
 
 - (void)mss_addExpandingSubview:(UIView *)subview {
-    [self mss_addExpandingSubview:subview edgeInsets:UIEdgeInsetsMake(0, 0, 0, 0)];
+    [self mss_addExpandingSubview:subview edgeInsets:UIEdgeInsetsZero];
 }
 
 - (void)mss_addExpandingSubview:(UIView *)subview edgeInsets:(UIEdgeInsets)insets {
