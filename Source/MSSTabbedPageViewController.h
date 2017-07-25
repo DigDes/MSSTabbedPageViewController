@@ -9,11 +9,12 @@
 #import "MSSPageViewController.h"
 #import "MSSTabNavigationBar.h"
 
-@interface MSSTabbedPageViewController : MSSPageViewController <MSSTabBarViewDataSource, MSSTabBarViewDelegate>
+@interface MSSTabbedPageViewController : UIViewController <MSSTabBarViewDataSource, MSSTabBarViewDelegate>
 
 /**
  The tab bar view.
  */
-@property (nonatomic, weak, nullable) IBOutlet MSSTabBarView *tabBarView;
+@property (nonatomic, strong, nullable) MSSTabBarView *tabBarView;
+@property (nonatomic, strong, nullable) MSSPageViewController *pageViewController;
 
 @end

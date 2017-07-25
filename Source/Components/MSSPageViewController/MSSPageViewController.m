@@ -472,6 +472,14 @@ willTransitionToViewControllers:(NSArray<UIViewController *> *)pendingViewContro
             [self updateCurrentPage:index];
         }
     }
+    else {
+        NSInteger index = [self indexOfViewController:pageViewController.viewControllers.firstObject];
+        if (index != NSNotFound) {
+            if ([self.delegate respondsToSelector:@selector(pageViewController:didScrollToPage:)]) {
+                [self.delegate pageViewController:self didScrollToPage:index];
+            }
+        }
+    }
 }
 
 #pragma mark - MSSPageViewController data source

@@ -25,6 +25,10 @@
 @property (nonatomic, weak) IBOutlet UILabel *imageTextTitleLabel;
 @property (nonatomic, weak) IBOutlet UIImageView *imageTextImageView;
 
+@property (nonatomic, weak) IBOutlet UIView *verticalImageTextContainerView;
+@property (nonatomic, weak) IBOutlet UILabel *verticalImageTextTitleLabel;
+@property (nonatomic, weak) IBOutlet UIImageView *verticalImageTextImageView;
+
 @property (nonatomic, weak) IBOutlet NSLayoutConstraint *containerViewBottomMargin;
 
 @end
@@ -57,6 +61,7 @@
 - (void)setTitle:(NSString *)title {
     self.textTitleLabel.text = title;
     self.imageTextTitleLabel.text = title;
+	self.verticalImageTextTitleLabel.text = title;
 }
 
 - (NSString *)title {
@@ -67,6 +72,7 @@
     if (self.tabStyle == MSSTabStyleImage || self.tabStyle == MSSTabStyleImageAndText) {
         self.imageImageView.image = image;
         self.imageTextImageView.image = image;
+		self.verticalImageTextImageView.image = image;
     }
 }
 
@@ -81,6 +87,7 @@
     if (!_isSelected) {
         self.textTitleLabel.textColor = textColor;
         self.imageTextTitleLabel.textColor = textColor;
+		self.verticalImageTextTitleLabel.textColor = textColor;
     }
 }
 
@@ -89,6 +96,7 @@
     if (_isSelected) {
         self.textTitleLabel.textColor = selectedTextColor;
         self.imageTextTitleLabel.textColor = selectedTextColor;
+		self.verticalImageTextTitleLabel.textColor = selectedTextColor;
     }
 }
 
@@ -97,6 +105,7 @@
     if (!_isSelected) {
         self.textTitleLabel.font = textFont;
         self.imageTextTitleLabel.font = textFont;
+		self.verticalImageTextTitleLabel.font = textFont;
     }
 }
 
@@ -105,6 +114,7 @@
     if (_isSelected) {
         self.textTitleLabel.font = selectedTextFont;
         self.imageTextTitleLabel.font = selectedTextFont;
+		self.verticalImageTextTitleLabel.font = selectedTextFont;
     }
 }
 
@@ -164,6 +174,7 @@
     } else {
         self.textTitleLabel.alpha = 1.0f;
         self.imageTextTitleLabel.alpha = 1.0f;
+		self.verticalImageTextImageView.alpha = 1.0f;
     }
 }
 
@@ -176,6 +187,7 @@
             if (self.alphaEffectEnabled) {
                 self.textTitleLabel.alpha = self.selectionProgress;
                 self.imageTextTitleLabel.alpha = self.selectionProgress;
+				self.verticalImageTextTitleLabel.alpha = self.selectionProgress;
             }
             break;
             
@@ -198,18 +210,22 @@
                      UIColor *textColor = isSelected ? self.selectedTextColor : self.textColor;
                      self.textTitleLabel.textColor = textColor;
                      self.imageTextTitleLabel.textColor = textColor;
+					 self.verticalImageTextTitleLabel.textColor = textColor;
                  } else {
                      self.textTitleLabel.textColor = self.textColor;
                      self.imageTextTitleLabel.textColor = self.textColor;
+					 self.verticalImageTextTitleLabel.textColor = self.textColor;
                  }
                  
                  if (self.selectedTextFont) {
                      UIFont *textFont = isSelected ? self.selectedTextFont : self.textFont;
                      self.textTitleLabel.font = textFont;
                      self.imageTextTitleLabel.font = textFont;
+					 self.verticalImageTextTitleLabel.font = textFont;
                  } else {
                      self.textTitleLabel.font = self.textFont;
                      self.imageTextTitleLabel.font = self.textFont;
+					 self.verticalImageTextTitleLabel.font = self.textFont;
                  }
                  
                  if (self.selectedTabBackgroundColor) {

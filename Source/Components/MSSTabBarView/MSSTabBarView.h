@@ -134,6 +134,11 @@ __attribute__((deprecated("Use numberOfItemsForTabBarView and tabBarView:populat
  */
 @property (nonatomic, assign) UIEdgeInsets contentInset UI_APPEARANCE_SELECTOR;
 
+/* A stack with a horizontal axis is a row of arrangedSubviews,
+ and a stack with a vertical axis is a column of arrangedSubviews.
+ */
+@property (nonatomic) UILayoutConstraintAxis axis UI_APPEARANCE_SELECTOR;
+
 /**
  The sizing style to use for tabs in the tab bar.
  
