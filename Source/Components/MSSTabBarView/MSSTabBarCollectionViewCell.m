@@ -27,6 +27,7 @@
 
 @property (nonatomic, weak) IBOutlet UIView *verticalImageTextContainerView;
 @property (nonatomic, weak) IBOutlet UILabel *verticalImageTextTitleLabel;
+@property (nonatomic, weak) IBOutlet UILabel *verticalImageTextDetailTitleLabel;
 @property (nonatomic, weak) IBOutlet UIImageView *verticalImageTextImageView;
 
 @property (nonatomic, weak) IBOutlet NSLayoutConstraint *containerViewBottomMargin;
@@ -66,6 +67,14 @@
 
 - (NSString *)title {
     return self.textTitleLabel.text;
+}
+
+-(void)setDetailText:(NSString *)detailText {
+	self.verticalImageTextDetailTitleLabel.text = detailText;
+}
+
+- (NSString *)detailText {
+	return self.verticalImageTextDetailTitleLabel.text;
 }
 
 - (void)setImage:(UIImage *)image {

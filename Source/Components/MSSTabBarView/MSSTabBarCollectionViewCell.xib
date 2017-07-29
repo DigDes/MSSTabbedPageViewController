@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="12121" systemVersion="16G29" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="13168.3" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
     <device id="retina5_5" orientation="landscape">
         <adaptation id="fullscreen"/>
     </device>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="12089"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="13147.4"/>
         <capability name="Aspect ratio constraints" minToolsVersion="5.1"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -92,10 +92,16 @@
                                             <constraint firstAttribute="width" constant="44" id="xqr-VI-17P"/>
                                         </constraints>
                                     </imageView>
-                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" horizontalCompressionResistancePriority="752" verticalCompressionResistancePriority="752" text="Label" lineBreakMode="tailTruncation" numberOfLines="3" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="sdz-81-9dw">
-                                        <rect key="frame" x="46" y="27" width="141" height="17"/>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalCompressionResistancePriority="752" verticalCompressionResistancePriority="752" text="Label" lineBreakMode="tailTruncation" numberOfLines="3" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="sdz-81-9dw">
+                                        <rect key="frame" x="46" y="5" width="141" height="47"/>
                                         <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                         <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" horizontalCompressionResistancePriority="752" verticalCompressionResistancePriority="752" text="Label" lineBreakMode="tailTruncation" numberOfLines="3" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="6Nw-nl-H45">
+                                        <rect key="frame" x="46" y="52" width="143" height="12"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="10"/>
+                                        <color key="textColor" red="0.5568627451" green="0.5568627451" blue="0.5568627451" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                         <nil key="highlightedColor"/>
                                     </label>
                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="PJ0-oU-5nj">
@@ -110,12 +116,16 @@
                                 <constraints>
                                     <constraint firstItem="Tac-Kz-Sme" firstAttribute="leading" secondItem="T1a-6i-a9B" secondAttribute="leading" constant="2" id="12h-gQ-n0X"/>
                                     <constraint firstAttribute="bottom" secondItem="PJ0-oU-5nj" secondAttribute="bottom" id="7XA-9a-Sah"/>
+                                    <constraint firstAttribute="trailing" secondItem="6Nw-nl-H45" secondAttribute="trailing" id="9eS-0E-YHi"/>
+                                    <constraint firstItem="6Nw-nl-H45" firstAttribute="top" secondItem="sdz-81-9dw" secondAttribute="bottom" id="Due-Ot-jge"/>
+                                    <constraint firstItem="6Nw-nl-H45" firstAttribute="leading" secondItem="Tac-Kz-Sme" secondAttribute="trailing" id="EaO-WA-1XC"/>
+                                    <constraint firstItem="PJ0-oU-5nj" firstAttribute="top" secondItem="6Nw-nl-H45" secondAttribute="bottom" constant="5" id="Fpj-vD-eWm"/>
                                     <constraint firstItem="PJ0-oU-5nj" firstAttribute="leading" secondItem="T1a-6i-a9B" secondAttribute="leading" id="VRY-He-G5a"/>
                                     <constraint firstItem="Tac-Kz-Sme" firstAttribute="centerY" secondItem="T1a-6i-a9B" secondAttribute="centerY" id="W1A-TS-pgx"/>
                                     <constraint firstAttribute="trailing" secondItem="sdz-81-9dw" secondAttribute="trailing" constant="2" id="Y6h-xm-Kjt"/>
-                                    <constraint firstItem="sdz-81-9dw" firstAttribute="centerY" secondItem="T1a-6i-a9B" secondAttribute="centerY" id="dmv-au-iaP"/>
                                     <constraint firstAttribute="trailing" secondItem="PJ0-oU-5nj" secondAttribute="trailing" id="hAh-9p-r8c"/>
                                     <constraint firstItem="sdz-81-9dw" firstAttribute="leading" secondItem="Tac-Kz-Sme" secondAttribute="trailing" id="hXc-PC-Jyt"/>
+                                    <constraint firstItem="sdz-81-9dw" firstAttribute="top" secondItem="T1a-6i-a9B" secondAttribute="top" constant="5" id="nCo-j7-eZR"/>
                                 </constraints>
                             </view>
                         </subviews>
@@ -172,6 +182,7 @@
                 <outlet property="textContainerView" destination="Aya-Fe-hSc" id="nwO-Gv-S7S"/>
                 <outlet property="textTitleLabel" destination="rRD-HZ-IpS" id="lXn-cB-IGu"/>
                 <outlet property="verticalImageTextContainerView" destination="T1a-6i-a9B" id="voz-Qc-fKJ"/>
+                <outlet property="verticalImageTextDetailTitleLabel" destination="6Nw-nl-H45" id="h1W-sU-FGn"/>
                 <outlet property="verticalImageTextImageView" destination="Tac-Kz-Sme" id="D5b-up-hXg"/>
                 <outlet property="verticalImageTextTitleLabel" destination="sdz-81-9dw" id="ZRj-OV-uch"/>
             </connections>

@@ -38,6 +38,8 @@
  */
 @property (nonatomic, copy, nullable) NSString *title;
 
+@property (nonatomic, copy, nullable) NSString *detailText;
+
 + (CGFloat)heightForText:(NSString *)aText detailText:(NSString *)detailText width:(CGFloat)width font:(UIFont *)font;
 
 @end
