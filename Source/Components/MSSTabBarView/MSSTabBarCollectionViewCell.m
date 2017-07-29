@@ -80,6 +80,60 @@
     return self.imageImageView.image;
 }
 
+- (UIImage *)highlightedImage {
+	return self.imageImageView.highlightedImage;
+}
+
+- (void)setHighlightedImage:(UIImage *)highlightedImage {
+	if (self.tabStyle == MSSTabStyleImage || self.tabStyle == MSSTabStyleImageAndText) {
+		self.imageImageView.highlightedImage = highlightedImage;
+		self.imageTextImageView.highlightedImage = highlightedImage;
+		self.verticalImageTextImageView.highlightedImage = highlightedImage;
+	}
+}
+
+static CGFloat const kTableViewCellMinHeight = 44.0f;
+static CGFloat const kTableViewCellMaxHeight = 70.0f;
+
++ (CGFloat)heightForText:(NSString *)aText detailText:(NSString *)detailText width:(CGFloat)width font:(UIFont *)font {
+	NSMutableParagraphStyle *paragraphStyle = [[NSMutableParagraphStyle alloc] init];
+	paragraphStyle.lineBreakMode = NSLineBreakByWordWrapping;
+	
+	NSDictionary *attributes = @{NSFontAttributeName: font, NSParagraphStyleAttributeName: paragraphStyle};
+	
+	CGFloat imageOffset = 44.0f;
+	
+//	if ([AppSettings instance].customerSpecificSettingsMPT && ![AppSettings instance].customerSpecificSettingsMPT_Minister) {
+//		imageOffset = 49.0f;
+//	}
+	CGRect rect = [aText boundingRectWithSize:CGSizeMake(width - imageOffset, MAXFLOAT)
+									  options:NSStringDrawingUsesLineFragmentOrigin
+								   attributes:attributes
+									  context:nil];
+	if (detailText.length > 0) {
+		if (CGRectGetHeight(rect) < 22.0f) {
+			return kTableViewCellMinHeight;
+		}
+		else if (CGRectGetHeight(rect) >= 22.0f && CGRectGetHeight(rect) < 48.0f) {
+			return CGRectGetHeight(rect) + 22.0f;
+		}
+		else {
+			return kTableViewCellMaxHeight;
+		}
+	}
+	else {
+		if (CGRectGetHeight(rect) < 35.0f) {
+			return kTableViewCellMinHeight;
+		}
+		else if (CGRectGetHeight(rect) >= 35.0f && CGRectGetHeight(rect) < 57.0f) {
+			return CGRectGetHeight(rect) + 13.0f;
+		}
+		else {
+			return kTableViewCellMaxHeight;
+		}
+	}
+}
+
 #pragma mark - Private
 
 - (void)setTextColor:(UIColor *)textColor {
@@ -97,6 +151,9 @@
         self.textTitleLabel.textColor = selectedTextColor;
         self.imageTextTitleLabel.textColor = selectedTextColor;
 		self.verticalImageTextTitleLabel.textColor = selectedTextColor;
+		self.imageImageView.tintColor = selectedTextColor;
+		self.imageTextImageView.tintColor = selectedTextColor;
+		self.verticalImageTextImageView.tintColor = selectedTextColor;
     }
 }
 
@@ -233,12 +290,14 @@
                  } else {
                      self.backgroundColor = self.tabBackgroundColor;
                  }
-                 
              } completion:nil];
         }
         
         _isSelected = isSelected;
         self.selected = isSelected;
+		self.imageImageView.highlighted = isSelected;
+		self.imageTextImageView.highlighted = isSelected;
+		self.verticalImageTextImageView.highlighted = isSelected;
     }
 }
 

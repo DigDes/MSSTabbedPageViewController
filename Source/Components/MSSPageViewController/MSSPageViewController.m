@@ -148,13 +148,15 @@ NSInteger const MSSPageViewControllerPageNumberInvalid = -1;
         
         UIViewController *viewController = [self viewControllerAtIndex:index];
         UIPageViewControllerNavigationDirection direction = isForwards ? UIPageViewControllerNavigationDirectionForward : UIPageViewControllerNavigationDirectionReverse;
-        
-        typeof(self) __weak weakSelf = self;
+		
+		[self pageViewController:self.pageViewController willTransitionToViewControllers:@[viewController]];
+		
+        __weak __typeof(self) weakSelf = self;
         [self.pageViewController setViewControllers:@[viewController]
                                           direction:direction
                                            animated:animated
                                          completion:^(BOOL finished) {
-                                             typeof(weakSelf) __strong strongSelf = weakSelf;
+                                             __strong __typeof(weakSelf) strongSelf = weakSelf;
                                              [strongSelf updateCurrentPage:index];
                                              if (completion) {
                                                  completion(viewController, animated, finished);

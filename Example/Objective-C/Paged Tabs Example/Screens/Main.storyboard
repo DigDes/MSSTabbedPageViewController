@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="12121" systemVersion="16F73" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="PnR-mV-E6n">
-    <device id="retina5_5" orientation="portrait">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="13168.3" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="PnR-mV-E6n">
+    <device id="retina4_7" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="12089"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="13147.4"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -18,11 +18,11 @@
                         <viewControllerLayoutGuide type="bottom" id="wfy-db-euE"/>
                     </layoutGuides>
                     <view key="view" contentMode="scaleToFill" id="8bC-Xf-vdC">
-                        <rect key="frame" x="0.0" y="0.0" width="414" height="736"/>
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Page X" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="pjY-bc-PW7">
-                                <rect key="frame" x="176.33333333333337" y="356" width="61.666666666666657" height="24"/>
+                                <rect key="frame" x="157.5" y="321.5" width="60" height="24"/>
                                 <fontDescription key="fontDescription" type="system" weight="light" pointSize="20"/>
                                 <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <nil key="highlightedColor"/>
@@ -66,7 +66,7 @@
                         <viewControllerLayoutGuide type="bottom" id="f4L-I6-hqw"/>
                     </layoutGuides>
                     <view key="view" contentMode="scaleToFill" id="R6r-h9-cLP">
-                        <rect key="frame" x="0.0" y="0.0" width="414" height="736"/>
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                     </view>
@@ -85,11 +85,11 @@
                         <viewControllerLayoutGuide type="bottom" id="BTu-pM-MMd"/>
                     </layoutGuides>
                     <view key="view" contentMode="scaleToFill" id="soB-l3-j58">
-                        <rect key="frame" x="0.0" y="0.0" width="414" height="736"/>
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="J0c-gz-YJt">
-                                <rect key="frame" x="0.0" y="0.0" width="414" height="736"/>
+                                <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                                 <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <connections>
                                     <outlet property="dataSource" destination="XHJ-ZZ-Ryp" id="SAo-Qk-J4y"/>
@@ -131,11 +131,11 @@
                         <viewControllerLayoutGuide type="bottom" id="w7p-0t-sTk"/>
                     </layoutGuides>
                     <view key="view" contentMode="scaleToFill" id="dNZ-yt-JE0">
-                        <rect key="frame" x="0.0" y="0.0" width="414" height="736"/>
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="qGY-SQ-R5H">
-                                <rect key="frame" x="0.0" y="64" width="414" height="50"/>
+                                <rect key="frame" x="0.0" y="64" width="375" height="603"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="50" id="Nw1-Wr-Tgq"/>
@@ -154,38 +154,54 @@
                                 </variation>
                             </view>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="3Ep-5g-C9H">
-                                <rect key="frame" x="0.0" y="114" width="414" height="622"/>
+                                <rect key="frame" x="0.0" y="64" width="375" height="603"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                             </view>
+                            <button opaque="NO" contentMode="left" contentHorizontalAlignment="left" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="rsd-eI-CJS" userLabel="Splitter Button" customClass="EWStatesButton">
+                                <rect key="frame" x="320" y="182" width="44" height="50"/>
+                                <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="0.0" colorSpace="custom" customColorSpace="sRGB"/>
+                                <gestureRecognizers/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="50" id="UZt-aM-40A"/>
+                                    <constraint firstAttribute="width" constant="44" id="rOz-TH-8Ma"/>
+                                </constraints>
+                                <state key="normal" image="PageContainerSplitter">
+                                    <color key="titleShadowColor" red="0.5" green="0.5" blue="0.5" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                </state>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
                             <constraint firstItem="3Ep-5g-C9H" firstAttribute="leading" secondItem="qGY-SQ-R5H" secondAttribute="trailing" id="7nC-9Y-f2i"/>
                             <constraint firstItem="qGY-SQ-R5H" firstAttribute="leading" secondItem="dNZ-yt-JE0" secondAttribute="leading" id="E5b-Ml-ShA"/>
-                            <constraint firstItem="w7p-0t-sTk" firstAttribute="top" secondItem="3Ep-5g-C9H" secondAttribute="bottom" id="Stl-Dw-f3A"/>
-                            <constraint firstItem="qGY-SQ-R5H" firstAttribute="top" secondItem="hrX-NP-I6C" secondAttribute="bottom" id="XxX-o0-0Ix"/>
-                            <constraint firstItem="w7p-0t-sTk" firstAttribute="top" secondItem="qGY-SQ-R5H" secondAttribute="bottom" id="a9W-dP-fMC"/>
+                            <constraint firstItem="qGY-SQ-R5H" firstAttribute="top" secondItem="hrX-NP-I6C" secondAttribute="bottom" id="Rp8-XA-n37"/>
+                            <constraint firstItem="w7p-0t-sTk" firstAttribute="top" secondItem="qGY-SQ-R5H" secondAttribute="bottom" id="Urz-MN-W9S"/>
                             <constraint firstAttribute="trailing" secondItem="3Ep-5g-C9H" secondAttribute="trailing" id="aeh-ZR-PBa"/>
+                            <constraint firstItem="rsd-eI-CJS" firstAttribute="centerY" secondItem="dNZ-yt-JE0" secondAttribute="centerY" id="b4W-yh-nsh"/>
                             <constraint firstItem="3Ep-5g-C9H" firstAttribute="leading" secondItem="dNZ-yt-JE0" secondAttribute="leading" id="bsI-zP-5vd"/>
-                            <constraint firstItem="3Ep-5g-C9H" firstAttribute="top" secondItem="hrX-NP-I6C" secondAttribute="bottom" id="los-MX-lgB"/>
+                            <constraint firstItem="3Ep-5g-C9H" firstAttribute="top" secondItem="hrX-NP-I6C" secondAttribute="bottom" id="dsf-n8-RHr"/>
                             <constraint firstAttribute="trailing" secondItem="qGY-SQ-R5H" secondAttribute="trailing" id="nmq-Mt-BFw"/>
+                            <constraint firstItem="rsd-eI-CJS" firstAttribute="leading" secondItem="3Ep-5g-C9H" secondAttribute="leading" id="uXH-Ct-8kh"/>
+                            <constraint firstItem="w7p-0t-sTk" firstAttribute="top" secondItem="3Ep-5g-C9H" secondAttribute="bottom" id="yPo-QA-aSP"/>
                             <constraint firstItem="3Ep-5g-C9H" firstAttribute="top" secondItem="qGY-SQ-R5H" secondAttribute="bottom" id="zP5-bb-i3N"/>
                         </constraints>
                         <variation key="default">
+                            <mask key="subviews">
+                                <exclude reference="rsd-eI-CJS"/>
+                            </mask>
                             <mask key="constraints">
                                 <exclude reference="7nC-9Y-f2i"/>
-                                <exclude reference="los-MX-lgB"/>
-                                <exclude reference="a9W-dP-fMC"/>
                             </mask>
                         </variation>
                         <variation key="widthClass=regular">
+                            <mask key="subviews">
+                                <include reference="rsd-eI-CJS"/>
+                            </mask>
                             <mask key="constraints">
                                 <exclude reference="nmq-Mt-BFw"/>
                                 <include reference="7nC-9Y-f2i"/>
                                 <exclude reference="bsI-zP-5vd"/>
-                                <include reference="los-MX-lgB"/>
                                 <exclude reference="zP5-bb-i3N"/>
-                                <include reference="a9W-dP-fMC"/>
                             </mask>
                         </variation>
                     </view>
@@ -217,4 +233,7 @@
             <point key="canvasLocation" x="1933" y="-1146"/>
         </scene>
     </scenes>
+    <resources>
+        <image name="PageContainerSplitter" width="18" height="38"/>
+    </resources>
 </document>

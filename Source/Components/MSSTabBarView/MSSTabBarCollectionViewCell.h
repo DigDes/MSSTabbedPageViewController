@@ -25,11 +25,19 @@
  NOTE - only visible when using MSSTabStyleImage.
  */
 @property (nonatomic, strong, nullable) UIImage *image;
+
+/**
+ The image displayed in the tab of selected cell.
+ */
+@property (nonatomic, strong, nullable) UIImage *highlightedImage;
+
 /**
  The text displayed in the tab cell.
  
  NOTE - only visible when using MSSTabStyleText.
  */
 @property (nonatomic, copy, nullable) NSString *title;
+
++ (CGFloat)heightForText:(NSString *)aText detailText:(NSString *)detailText width:(CGFloat)width font:(UIFont *)font;
 
 @end

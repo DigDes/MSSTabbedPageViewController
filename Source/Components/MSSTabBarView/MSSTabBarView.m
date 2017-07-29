@@ -23,7 +23,7 @@ CGFloat     const MSSTabBarViewDefaultTabPadding = 8.0f;
 CGFloat     const MSSTabBarViewDefaultTabUnselectedAlpha = 0.3f;
 CGFloat     const MSSTabBarViewDefaultHorizontalContentInset = 8.0f;
 NSString *  const MSSTabBarViewDefaultTabTitleFormat = @"Tab %li";
-BOOL        const MSSTabBarViewDefaultScrollEnabled = NO;
+BOOL        const MSSTabBarViewDefaultScrollEnabled = YES;
 
 NSInteger   const MSSTabBarViewMaxDistributedTabs = 5;
 CGFloat     const MSSTabBarViewTabTransitionSnapRatio = 0.5f;
@@ -41,6 +41,8 @@ CGFloat     const MSSTabBarViewTabOffsetInvalid = -1.0f;
 
 @property (nonatomic, strong) UIView *indicatorContainer;
 @property (nonatomic, strong) UIView *indicatorView;
+@property (nonatomic, strong) UIView *separatorView;
+@property (nonatomic, strong) UIView *verticalSeparatorView;
 @property (nonatomic, assign) CGFloat lineIndicatorHeight;
 @property (nonatomic, assign) CGFloat lineIndicatorInset;
 
@@ -106,7 +108,7 @@ static MSSTabBarCollectionViewCell *_sizingCell;
     // Collection view
     UICollectionViewFlowLayout *layout = [UICollectionViewFlowLayout new];
     [layout setScrollDirection:UICollectionViewScrollDirectionHorizontal];
-    _collectionView = [[UICollectionView alloc]initWithFrame:CGRectZero collectionViewLayout:layout];
+    _collectionView = [[UICollectionView alloc] initWithFrame:CGRectZero collectionViewLayout:layout];
     _collectionView.dataSource = self;
     _collectionView.delegate = self;
     self.scrollEnabled = MSSTabBarViewDefaultScrollEnabled;
@@ -118,13 +120,51 @@ static MSSTabBarCollectionViewCell *_sizingCell;
     _indicatorContainer.userInteractionEnabled = NO;
     _indicatorAttributes = @{MSSTabIndicatorLineHeight : @(MSSTabBarViewDefaultTabIndicatorHeight),
                              NSForegroundColorAttributeName : self.tintColor};
+    
+    _separatorView = [UIView new];
+    _separatorView.backgroundColor = [UIColor colorWithWhite:0.9f alpha:1.0f];
+    _verticalSeparatorView = [UIView new];
+    _verticalSeparatorView.backgroundColor = [UIColor colorWithWhite:0.9f alpha:1.0f];
 }
 
 #pragma mark - Lifecycle
 
 - (void)willMoveToSuperview:(UIView *)newSuperview {
     [super willMoveToSuperview:newSuperview];
-    
+    if (!self.separatorView.superview) {
+        UIView *subview = self.separatorView;
+        [self addSubview:self.separatorView];
+        subview.translatesAutoresizingMaskIntoConstraints = NO;
+        NSDictionary *views = NSDictionaryOfVariableBindings(subview);
+        
+        NSString *verticalConstraints = [NSString stringWithFormat:@"V:[subview(1)]|"];
+        NSString *horizontalConstraints = [NSString stringWithFormat:@"H:|[subview]|"];
+        [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:verticalConstraints
+                                                                     options:0
+                                                                     metrics:nil
+                                                                       views:views]];
+        [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:horizontalConstraints
+                                                                     options:0
+                                                                     metrics:nil
+                                                                       views:views]];
+    }
+    if (!self.verticalSeparatorView.superview) {
+        UIView *subview = self.verticalSeparatorView;
+        [self addSubview:self.verticalSeparatorView];
+        subview.translatesAutoresizingMaskIntoConstraints = NO;
+        NSDictionary *views = NSDictionaryOfVariableBindings(subview);
+        
+        NSString *verticalConstraints = [NSString stringWithFormat:@"H:[subview(1)]|"];
+        NSString *horizontalConstraints = [NSString stringWithFormat:@"V:|[subview]|"];
+        [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:verticalConstraints
+                                                                     options:0
+                                                                     metrics:nil
+                                                                       views:views]];
+        [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:horizontalConstraints
+                                                                     options:0
+                                                                     metrics:nil
+                                                                       views:views]];
+    }
     if (!self.collectionView.superview) {
         
         // create sizing cell if required
@@ -142,7 +182,6 @@ static MSSTabBarCollectionViewCell *_sizingCell;
         self.collectionView.backgroundColor = [UIColor clearColor];
         self.collectionView.showsHorizontalScrollIndicator = NO;
     }
-    
     if (!self.indicatorContainer.superview) {
         [self.collectionView addSubview:self.indicatorContainer];
         [self updateIndicatorForStyle:self.indicatorStyle];
@@ -151,8 +190,8 @@ static MSSTabBarCollectionViewCell *_sizingCell;
 
 - (void)layoutSubviews {
     [super layoutSubviews];
-    
     [self updateTabBarForTabIndex:self.tabOffset];
+    [self updateTabBarForTabOffset:self.tabOffset];
     
     // if default tab has not yet been displayed
     if (self.tabCount > 0 && !self.selectedCell) {
@@ -204,16 +243,17 @@ static MSSTabBarCollectionViewCell *_sizingCell;
 #pragma mark - Collection View delegate
 
 - (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewFlowLayout *)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath {
-	
+	CGSize fittingSize = UILayoutFittingCompressedSize;
 	CGSize cellSize = CGSizeZero;
+	
 	if (self.axis == UILayoutConstraintAxisHorizontal) {
 		if (self.sizingStyle == MSSTabSizingStyleDistributed && self.tabCount <= MSSTabBarViewMaxDistributedTabs) { // distributed in frame
 			
 			CGFloat contentInsetTotal = self.contentInset.left + self.contentInset.right;
 			CGFloat totalSpacing = collectionViewLayout.minimumInteritemSpacing * (self.tabCount - 1);
-			CGFloat totalWidth = collectionView.bounds.size.width - contentInsetTotal - totalSpacing;
+			CGFloat totalWidth = CGRectGetWidth(collectionView.bounds) - contentInsetTotal - totalSpacing;
 			
-			return CGSizeMake(totalWidth / self.tabCount, collectionView.bounds.size.height);
+			return CGSizeMake(totalWidth / self.tabCount, CGRectGetHeight(collectionView.bounds));
 		}
 		else { // wrap tab contents
 			// update sizing cell with population
@@ -224,14 +264,16 @@ static MSSTabBarCollectionViewCell *_sizingCell;
 				_sizingCell.title = [self titleAtIndex:indexPath.row];
 			}
 			
-			CGSize requiredSize = [_sizingCell systemLayoutSizeFittingSize:CGSizeMake(0.0f, collectionView.bounds.size.height)
+			fittingSize.height = CGRectGetHeight(collectionView.bounds);
+			
+			CGSize requiredSize = [_sizingCell systemLayoutSizeFittingSize:fittingSize
 											   withHorizontalFittingPriority:UILayoutPriorityDefaultLow
 											   verticalFittingPriority:UILayoutPriorityRequired];
 			requiredSize.width += self.tabPadding;
 			cellSize = requiredSize;
 		}
 	}
-	else {
+	else {		
 		if ([self.dataSource respondsToSelector:@selector(tabBarView:populateTab:atIndex:)]) {
 			[self.dataSource tabBarView:self populateTab:_sizingCell atIndex:indexPath.item];
 		}
@@ -239,12 +281,16 @@ static MSSTabBarCollectionViewCell *_sizingCell;
 			_sizingCell.title = [self titleAtIndex:indexPath.row];
 		}
 		
-		CGSize requiredSize = [_sizingCell systemLayoutSizeFittingSize:CGSizeMake(CGRectGetWidth(collectionView.frame), 0.0f)
+		[_sizingCell setNeedsLayout];
+		[_sizingCell layoutIfNeeded];
+		
+		fittingSize.width = CGRectGetWidth(collectionView.bounds);
+		
+		CGSize requiredSize = [_sizingCell systemLayoutSizeFittingSize:fittingSize
 										   withHorizontalFittingPriority:UILayoutPriorityRequired
 										   verticalFittingPriority:UILayoutPriorityDefaultLow];
 		requiredSize.width = CGRectGetWidth(collectionView.bounds);
-		requiredSize.height = requiredSize.height >= 44 ?: 44;
-		requiredSize.height += self.tabPadding;
+		requiredSize.height = [MSSTabBarCollectionViewCell heightForText:_sizingCell.title detailText:@"" width:fittingSize.width font:[UIFont systemFontOfSize:14.0f]];
 		cellSize = requiredSize;
 	}
 	
@@ -361,7 +407,11 @@ static MSSTabBarCollectionViewCell *_sizingCell;
 - (void)setAxis:(UILayoutConstraintAxis)axis {
     _axis = axis;
     self.indicatorContainer.hidden = _axis == UILayoutConstraintAxisVertical;
+    self.separatorView.hidden = _axis == UILayoutConstraintAxisVertical;
+    self.verticalSeparatorView.hidden = _axis == UILayoutConstraintAxisHorizontal;
+	self.collectionView.contentInset = _axis == UILayoutConstraintAxisHorizontal ? self.contentInset : UIEdgeInsetsZero;
     UICollectionViewFlowLayout *layout = (UICollectionViewFlowLayout *)self.collectionView.collectionViewLayout;
+	layout.minimumLineSpacing = _axis == UILayoutConstraintAxisHorizontal ? 10.0f : 0.0f;
     layout.scrollDirection = _axis == UILayoutConstraintAxisHorizontal ? UICollectionViewScrollDirectionHorizontal : UICollectionViewScrollDirectionVertical;
     [layout invalidateLayout];
 }
@@ -877,14 +927,14 @@ static MSSTabBarCollectionViewCell *_sizingCell;
             case MSSIndicatorStyleImage: {
                 UIImageView *indicatorImageView = (UIImageView *)self.indicatorView;
                 
-                UIImage *indicatorImage;
-                if ((indicatorImage = self.indicatorAttributes[MSSTabIndicatorImage])) {
-                    indicatorImageView.image = [indicatorImage imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
-                }
-                
                 UIColor *indicatorTintColor;
                 if ((indicatorTintColor = self.indicatorAttributes[MSSTabIndicatorImageTintColor])) {
                     indicatorImageView.tintColor = indicatorTintColor;
+                }
+                
+                UIImage *indicatorImage;
+                if ((indicatorImage = self.indicatorAttributes[MSSTabIndicatorImage])) {
+                    indicatorImageView.image = [indicatorImage imageWithRenderingMode:indicatorTintColor ? UIImageRenderingModeAlwaysTemplate : UIImageRenderingModeAlwaysOriginal];
                 }
             }
                 break;
