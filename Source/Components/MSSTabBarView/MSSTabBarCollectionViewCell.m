@@ -57,6 +57,12 @@
     _alphaEffectEnabled = YES; // alpha effect enabled by default
 }
 
+- (void)prepareForReuse {
+	[super prepareForReuse];
+	self.verticalImageTextImageView.image = nil;
+	self.verticalImageTextImageView.highlightedImage = nil;
+}
+
 #pragma mark - Public
 
 - (void)setTitle:(NSString *)title {
@@ -189,21 +195,21 @@ static CGFloat const kTableViewCellMaxHeight = 70.0f;
     
     switch (tabStyle) {
         case MSSTabStyleImageAndText:
-            self.textContainerView.hidden = YES;
-            self.imageContainerView.hidden = YES;
+            [self.textContainerView removeFromSuperview];
+			[self.imageContainerView removeFromSuperview];
             self.imageTextContainerView.hidden = NO;
             break;
             
         case MSSTabStyleImage:
-            self.textContainerView.hidden = YES;
+			[self.textContainerView removeFromSuperview];
             self.imageContainerView.hidden = NO;
-            self.imageTextContainerView.hidden = YES;
+            [self.imageTextContainerView removeFromSuperview];
             break;
             
         default:
             self.textContainerView.hidden = NO;
-            self.imageContainerView.hidden = YES;
-            self.imageTextContainerView.hidden = YES;
+            [self.imageContainerView removeFromSuperview];
+            [self.imageTextContainerView removeFromSuperview];
             break;
     }
 }
