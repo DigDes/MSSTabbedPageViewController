@@ -185,8 +185,14 @@ static MSSTabBarCollectionViewCell *_sizingCell;
 - (void)layoutSubviews {
 	[super layoutSubviews];
 	[self updateDistributedCellsCount];
-	[self updateTabBarForTabIndex:self.tabOffset];
-	[self updateTabBarForTabOffset:self.tabOffset];
+	if (self.tabOffset == MSSTabBarViewTabOffsetInvalid) {
+		[self updateTabBarForTabIndex:self.defaultTabIndex];
+		[self updateTabBarForTabOffset:self.defaultTabIndex];
+	}
+	else {
+		[self updateTabBarForTabIndex:self.tabOffset];
+		[self updateTabBarForTabOffset:self.tabOffset];
+	}
 	
 	// if default tab has not yet been displayed
 	if (self.tabCount > 0 && !self.selectedCell) {
