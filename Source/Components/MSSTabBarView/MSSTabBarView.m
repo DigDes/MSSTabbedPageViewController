@@ -291,6 +291,10 @@ static MSSTabBarCollectionViewCell *_sizingCell;
 	return cellSize;
 }
 
+- (BOOL)collectionView:(UICollectionView *)collectionView shouldSelectItemAtIndexPath:(NSIndexPath *)indexPath {
+	return !_animatingTabChange;
+}
+
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
 	if ([self.delegate respondsToSelector:@selector(tabBarView:tabSelectedAtIndex:)]) {
 		[self.delegate tabBarView:self tabSelectedAtIndex:indexPath.row];
