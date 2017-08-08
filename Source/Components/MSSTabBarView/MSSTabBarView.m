@@ -330,11 +330,13 @@ static MSSTabBarCollectionViewCell *_sizingCell;
 
 - (void)setTabIndex:(NSInteger)index animated:(BOOL)animated {
 	if (animated) {
+		self.userInteractionEnabled = NO;
 		_animatingTabChange = YES;
 		[UIView animateWithDuration:0.25f animations:^{
 			[self updateTabBarForTabIndex:index];
 		} completion:^(BOOL finished) {
 			_animatingTabChange = NO;
+			self.userInteractionEnabled = YES;
 		}];
 	}
 	else {
