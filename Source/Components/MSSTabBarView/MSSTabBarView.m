@@ -19,7 +19,7 @@ NSString *const MSSTabBarViewCellIdentifier = @"tabCell";
 
 // defaults
 CGFloat const MSSTabBarViewDefaultHeight = 44.0f;
-CGFloat const MSSTabBarViewDefaultCellWidthForVerticalAxis = 320.0f;
+CGFloat const MSSTabBarViewDefaultCellWidthForVerticalAxis = 222.0f;
 CGFloat const MSSTabBarViewDefaultCellWidthForHorisontalAxis = 60.0f;
 CGFloat const MSSTabBarViewDefaultTabIndicatorHeight = 2.0f;
 CGFloat const MSSTabBarViewDefaultTabPadding = 8.0f;
@@ -65,6 +65,8 @@ CGFloat const MSSTabBarViewTabOffsetInvalid = -1.0f;
 static MSSTabBarCollectionViewCell *_sizingCell;
 
 @implementation MSSTabBarView
+
+@synthesize contentInset = _contentInset;
 
 #pragma mark - Init
 
@@ -318,6 +320,10 @@ static MSSTabBarCollectionViewCell *_sizingCell;
 	self.collectionView.contentInset = contentInset;
 }
 
+- (UIEdgeInsets)contentInset {
+	return self.axis == UILayoutConstraintAxisHorizontal ? _contentInset : UIEdgeInsetsZero;
+}
+
 - (void)setTabIndex:(NSInteger)index animated:(BOOL)animated {
 	if (animated) {
 		_animatingTabChange = YES;
@@ -404,7 +410,7 @@ static MSSTabBarCollectionViewCell *_sizingCell;
 	self.indicatorContainer.hidden = _axis == UILayoutConstraintAxisVertical;
 	self.separatorView.hidden = _axis == UILayoutConstraintAxisVertical;
 	self.verticalSeparatorView.hidden = _axis == UILayoutConstraintAxisHorizontal;
-	self.collectionView.contentInset = _axis == UILayoutConstraintAxisHorizontal ? self.contentInset : UIEdgeInsetsZero;
+	self.collectionView.contentInset = self.contentInset;
 	UICollectionViewFlowLayout *layout = (UICollectionViewFlowLayout *) self.collectionView.collectionViewLayout;
 	layout.minimumLineSpacing = _axis == UILayoutConstraintAxisHorizontal ? 10.0f : 0.0f;
 	layout.scrollDirection = _axis == UILayoutConstraintAxisHorizontal ? UICollectionViewScrollDirectionHorizontal : UICollectionViewScrollDirectionVertical;
