@@ -233,10 +233,14 @@ static CGFloat const kTableViewCellMaxHeight = 70.0f;
 }
 
 - (void)setSelectionProgress:(CGFloat)selectionProgress {
-    _selectionProgress = selectionProgress;
-    
-    [self updateProgressiveAppearance];
-    [self updateSelectionAppearance];
+	[self setSelectionProgress:selectionProgress animated:YES];
+}
+
+- (void)setSelectionProgress:(CGFloat)selectionProgress animated:(BOOL)animated {
+	_selectionProgress = selectionProgress;
+	
+	[self updateProgressiveAppearance];
+	[self updateSelectionAppearanceAnimated:animated];
 }
 
 - (void)setAlphaEffectEnabled:(BOOL)alphaEffectEnabled {
@@ -268,13 +272,13 @@ static CGFloat const kTableViewCellMaxHeight = 70.0f;
     }
 }
 
-- (void)updateSelectionAppearance {
+- (void)updateSelectionAppearanceAnimated:(BOOL)animated {
     BOOL isSelected = (self.selectionProgress == 1.0f);
     if (_isSelected != isSelected) { // update selected state
         
         if (self.selectedTextFont || self.selectedTextColor) {
             [UIView transitionWithView:self
-                              duration:0.2f
+                              duration:animated ? 0.2f : 0.0f
                                options:UIViewAnimationOptionTransitionCrossDissolve
                             animations:
              ^{

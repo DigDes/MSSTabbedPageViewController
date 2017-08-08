@@ -233,6 +233,9 @@ static MSSTabBarCollectionViewCell *_sizingCell;
 		_hasRespectedDefaultTabIndex = YES;
 		[self setTabCellActive:cell indexPath:indexPath];
 	}
+	else if ([self.selectedIndexPath isEqual:indexPath]) {
+		[cell setSelectionProgress:1.0f animated:NO];
+	}
 	
 	return cell;
 }
@@ -535,7 +538,7 @@ static MSSTabBarCollectionViewCell *_sizingCell;
 	}
 }
 
-- (void)setTabCellActive:(MSSTabBarCollectionViewCell *)cell indexPath:(NSIndexPath *)indexPath {
+- (void)setTabCellActive:(MSSTabBarCollectionViewCell *)cell indexPath:( NSIndexPath *)indexPath {
 	_selectedCell = cell;
 	_selectedIndexPath = indexPath;
 	
