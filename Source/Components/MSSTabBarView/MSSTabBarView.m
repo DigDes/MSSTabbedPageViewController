@@ -15,23 +15,25 @@
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
 
-NSString *const MSSTabBarViewCellIdentifier = @"tabCell";
+static NSString *const MSSTabBarViewCellIdentifier = @"MSSTabBarCollectionViewCell";
+static NSString *const MSSTabBarViewTextCellIdentifier = @"MSSTabBarTextCollectionViewCell";
 
 // defaults
 CGFloat const MSSTabBarViewDefaultHeight = 44.0f;
-CGFloat const MSSTabBarViewDefaultCellWidthForVerticalAxis = 222.0f;
-CGFloat const MSSTabBarViewDefaultCellWidthForHorisontalAxis = 60.0f;
-CGFloat const MSSTabBarViewDefaultTabIndicatorHeight = 2.0f;
-CGFloat const MSSTabBarViewDefaultTabPadding = 8.0f;
-CGFloat const MSSTabBarViewDefaultTabUnselectedAlpha = 0.3f;
-CGFloat const MSSTabBarViewDefaultHorizontalContentInset = 8.0f;
-NSString *const MSSTabBarViewDefaultTabTitleFormat = @"Tab %li";
-BOOL const MSSTabBarViewDefaultScrollEnabled = YES;
 
-NSInteger const MSSTabBarViewDefaultMaxDistributedTabs = 5;
-CGFloat const MSSTabBarViewTabTransitionSnapRatio = 0.5f;
+static CGFloat const MSSTabBarViewDefaultCellWidthForVerticalAxis = 222.0f;
+static CGFloat const MSSTabBarViewDefaultCellWidthForHorisontalAxis = 60.0f;
+static CGFloat const MSSTabBarViewDefaultTabIndicatorHeight = 2.0f;
+static CGFloat const MSSTabBarViewDefaultTabPadding = 8.0f;
+static CGFloat const MSSTabBarViewDefaultTabUnselectedAlpha = 0.3f;
+static CGFloat const MSSTabBarViewDefaultHorizontalContentInset = 8.0f;
+static NSString *const MSSTabBarViewDefaultTabTitleFormat = @"Tab %li";
+static BOOL const MSSTabBarViewDefaultScrollEnabled = YES;
 
-CGFloat const MSSTabBarViewTabOffsetInvalid = -1.0f;
+static NSInteger const MSSTabBarViewDefaultMaxDistributedTabs = 5;
+static CGFloat const MSSTabBarViewTabTransitionSnapRatio = 0.5f;
+
+static CGFloat const MSSTabBarViewTabOffsetInvalid = -1.0f;
 
 @interface MSSTabBarView () <UICollectionViewDataSource, UICollectionViewDelegateFlowLayout>
 
@@ -60,9 +62,9 @@ CGFloat const MSSTabBarViewTabOffsetInvalid = -1.0f;
 
 @property (nonatomic, assign) BOOL animateDataSourceTransition;
 
-@end
+@property (nonatomic, strong) MSSTabBarCollectionViewCell *sizingCell;
 
-static MSSTabBarCollectionViewCell *_sizingCell;
+@end
 
 @implementation MSSTabBarView
 
@@ -163,16 +165,7 @@ static MSSTabBarCollectionViewCell *_sizingCell;
 		[self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:horizontalConstraints options:0 metrics:nil views:views]];
 	}
 	if (!self.collectionView.superview) {
-		
-		// create sizing cell if required
-		UINib *cellNib = [UINib nibWithNibName:NSStringFromClass([MSSTabBarCollectionViewCell class])
-								bundle:[NSBundle bundleForClass:[MSSTabBarCollectionViewCell class]]];
-		[self.collectionView registerNib:cellNib forCellWithReuseIdentifier:MSSTabBarViewCellIdentifier];
-		if (!_sizingCell) {
-			_sizingCell = [[cellNib instantiateWithOwner:self options:nil] objectAtIndex:0];
-		}
-		
-		// collection view
+		[self registerCellForTabStyle:self.tabStyle];
 		[self mss_addExpandingSubview:self.collectionView];
 		self.collectionView.contentInset = self.contentInset;
 		self.collectionView.backgroundColor = [UIColor clearColor];
@@ -266,22 +259,22 @@ static MSSTabBarCollectionViewCell *_sizingCell;
 	}
 	else {
 		if ([self.dataSource respondsToSelector:@selector(tabBarView:populateTab:atIndex:)]) {
-			[self.dataSource tabBarView:self populateTab:_sizingCell atIndex:indexPath.item];
+			[self.dataSource tabBarView:self populateTab:self.sizingCell atIndex:indexPath.item];
 		}
 		else {
-			_sizingCell.title = [self titleAtIndex:indexPath.row];
+			self.sizingCell.title = [self titleAtIndex:indexPath.row];
 		}
 		
-		[_sizingCell setNeedsLayout];
-		[_sizingCell layoutIfNeeded];
+		[self.sizingCell setNeedsLayout];
+		[self.sizingCell layoutIfNeeded];
 		
 		fittingSize.width = MSSTabBarViewDefaultCellWidthForVerticalAxis;
 		
-		CGSize requiredSize = [_sizingCell systemLayoutSizeFittingSize:fittingSize
-										   withHorizontalFittingPriority:UILayoutPriorityRequired
-										   verticalFittingPriority:UILayoutPriorityDefaultLow];
+		CGSize requiredSize = [self.sizingCell systemLayoutSizeFittingSize:fittingSize
+											   withHorizontalFittingPriority:UILayoutPriorityRequired
+											   verticalFittingPriority:UILayoutPriorityDefaultLow];
 		requiredSize.width = CGRectGetWidth(collectionView.bounds);
-		requiredSize.height = [MSSTabBarCollectionViewCell heightForText:_sizingCell.title
+		requiredSize.height = [MSSTabBarCollectionViewCell heightForText:self.sizingCell.title
 														   detailText:@""
 														   width:fittingSize.width
 														   font:[UIFont systemFontOfSize:14.0f]];
@@ -435,8 +428,21 @@ static MSSTabBarCollectionViewCell *_sizingCell;
 
 - (void)setTabStyle:(MSSTabStyle)tabStyle {
 	_tabStyle = tabStyle;
-	_sizingCell.tabStyle = tabStyle;
+	[self registerCellForTabStyle:tabStyle];
 	[self reloadData];
+}
+
+- (void)registerCellForTabStyle:(MSSTabStyle)tabStyle {
+	UINib *cellNib;
+	if (tabStyle == MSSTabStyleText) {
+		cellNib = [UINib nibWithNibName:MSSTabBarViewTextCellIdentifier bundle:[NSBundle bundleForClass:[MSSTabBarCollectionViewCell class]]];
+		[self.collectionView registerNib:cellNib forCellWithReuseIdentifier:MSSTabBarViewCellIdentifier];
+	}
+	else {
+		cellNib = [UINib nibWithNibName:MSSTabBarViewCellIdentifier bundle:[NSBundle bundleForClass:[MSSTabBarCollectionViewCell class]]];
+		[self.collectionView registerNib:cellNib forCellWithReuseIdentifier:MSSTabBarViewCellIdentifier];
+	}
+	self.sizingCell = [[cellNib instantiateWithOwner:self options:nil] objectAtIndex:0];
 }
 
 - (void)setTintColor:(UIColor *)tintColor {
@@ -550,7 +556,7 @@ static MSSTabBarCollectionViewCell *_sizingCell;
 	}
 }
 
-- (void)setTabCellActive:(MSSTabBarCollectionViewCell *)cell indexPath:( NSIndexPath *)indexPath {
+- (void)setTabCellActive:(MSSTabBarCollectionViewCell *)cell indexPath:(NSIndexPath *)indexPath {
 	_selectedCell = cell;
 	_selectedIndexPath = indexPath;
 	
@@ -813,18 +819,21 @@ static MSSTabBarCollectionViewCell *_sizingCell;
 
 - (CGSize)getSizeToFitCellSize:(UICollectionView *)collectionView forIndex:(NSUInteger)index {
 	if ([self.dataSource respondsToSelector:@selector(tabBarView:populateTab:atIndex:)]) {
-		[self.dataSource tabBarView:self populateTab:_sizingCell atIndex:index];
+		[self.dataSource tabBarView:self populateTab:self.sizingCell atIndex:index];
 	}
 	else {
-		_sizingCell.title = [self titleAtIndex:index];
+		self.sizingCell.title = [self titleAtIndex:index];
 	}
+	
+	[self.sizingCell setNeedsLayout];
+	[self.sizingCell layoutIfNeeded];
+	
 	CGSize fittingSize = UILayoutFittingCompressedSize;
 	fittingSize.height = CGRectGetHeight(collectionView.bounds);
 	
-	CGSize requiredSize = [_sizingCell systemLayoutSizeFittingSize:fittingSize
-									   withHorizontalFittingPriority:UILayoutPriorityDefaultLow
-									   verticalFittingPriority:UILayoutPriorityRequired];
-	requiredSize.width = MSSTabBarViewDefaultCellWidthForHorisontalAxis;
+	CGSize requiredSize = [self.sizingCell systemLayoutSizeFittingSize:fittingSize
+										   withHorizontalFittingPriority:UILayoutPriorityFittingSizeLevel
+										   verticalFittingPriority:UILayoutPriorityRequired];
 	requiredSize.width += self.tabPadding;
 	return requiredSize;
 }
