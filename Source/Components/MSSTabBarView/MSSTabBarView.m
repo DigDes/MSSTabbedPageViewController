@@ -483,6 +483,13 @@ static CGFloat const MSSTabBarViewTabOffsetInvalid = -1.0f;
 	}
 }
 
+- (void)reloadData {
+	if (self.tabOffset == MSSTabBarViewTabOffsetInvalid) {
+		_hasRespectedDefaultTabIndex = NO;
+	}
+	[self.collectionView reloadData];
+}
+
 #pragma mark - Tab Bar State
 
 - (void)updateTabBarForTabOffset:(CGFloat)tabOffset {
@@ -836,13 +843,6 @@ static CGFloat const MSSTabBarViewTabOffsetInvalid = -1.0f;
 										   verticalFittingPriority:UILayoutPriorityRequired];
 	requiredSize.width += self.tabPadding;
 	return requiredSize;
-}
-
-- (void)reloadData {
-	if (self.tabOffset == MSSTabBarViewTabOffsetInvalid) {
-		_hasRespectedDefaultTabIndex = NO;
-	}
-	[self.collectionView reloadData];
 }
 
 - (void)updateCellAppearance:(MSSTabBarCollectionViewCell *)cell {
