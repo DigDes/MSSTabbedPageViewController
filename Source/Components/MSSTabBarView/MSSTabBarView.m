@@ -60,6 +60,8 @@ static CGFloat const MSSTabBarViewTabOffsetInvalid = -1.0f;
 
 @property (nonatomic, assign) BOOL hasRespectedDefaultTabIndex;
 
+@property (nonatomic, assign) BOOL hasScrolledCollectionView;
+
 @property (nonatomic, assign) BOOL animateDataSourceTransition;
 
 @property (nonatomic, strong) MSSTabBarCollectionViewCell *sizingCell;
@@ -224,7 +226,7 @@ static CGFloat const MSSTabBarViewTabOffsetInvalid = -1.0f;
 	cell.selectionProgress = self.tabDeselectedAlpha;
 	
 	if ((!self.hasRespectedDefaultTabIndex && indexPath.row == self.defaultTabIndex) ||
-		([self.selectedIndexPath isEqual:indexPath] && self.tabOffset == MSSTabBarViewTabOffsetInvalid)) {
+		([self.selectedIndexPath isEqual:indexPath] && self.tabOffset == MSSTabBarViewTabOffsetInvalid && !self.hasScrolledCollectionView)) {
 		_hasRespectedDefaultTabIndex = YES;
 		[self setTabCellActive:cell indexPath:indexPath];
 	}
@@ -292,6 +294,21 @@ static CGFloat const MSSTabBarViewTabOffsetInvalid = -1.0f;
 	if ([self.delegate respondsToSelector:@selector(tabBarView:tabSelectedAtIndex:)]) {
 		[self.delegate tabBarView:self tabSelectedAtIndex:indexPath.row];
 	}
+}
+
+#pragma mark - Scroll View Delegate
+
+- (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView {
+    _collectionView.allowsSelection = NO;
+    _hasScrolledCollectionView = YES;
+}
+
+- (void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate {
+    _collectionView.allowsSelection = YES;
+}
+
+- (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView {
+    [_collectionView selectItemAtIndexPath:self.selectedIndexPath animated:NO scrollPosition:UICollectionViewScrollPositionNone];
 }
 
 #pragma mark - Public
@@ -488,6 +505,7 @@ static CGFloat const MSSTabBarViewTabOffsetInvalid = -1.0f;
 		_hasRespectedDefaultTabIndex = NO;
 	}
 	[self.collectionView reloadData];
+    _hasScrolledCollectionView = NO;
 }
 
 #pragma mark - Tab Bar State
@@ -504,12 +522,22 @@ static CGFloat const MSSTabBarViewTabOffsetInvalid = -1.0f;
 		MSSTabBarCollectionViewCell *firstTabCell = [self collectionViewCellAtTabIndex:0];
 		[self updateTabsWithCurrentTabCell:firstTabCell nextTabCell:firstTabCell progress:1.0f backwards:NO];
 		[self updateIndicatorViewWithCurrentTabCell:firstTabCell nextTabCell:firstTabCell progress:1.0f axis:self.axis];
+        
+        NSIndexPath *indexPath = [NSIndexPath indexPathForRow:0 inSection:0];
+        [self setTabCellsInactiveExceptTabIndex:indexPath.row];
+        [self setTabCellActive:firstTabCell indexPath:indexPath];
+        [_collectionView selectItemAtIndexPath:indexPath animated:NO scrollPosition:UICollectionViewScrollPositionNone];
 	}
 	else if (tabOffset >= self.tabCount - 1) { // stick at top of tab bar
 		
 		MSSTabBarCollectionViewCell *lastTabCell = [self collectionViewCellAtTabIndex:self.tabCount - 1];
 		[self updateTabsWithCurrentTabCell:lastTabCell nextTabCell:lastTabCell progress:1.0f backwards:NO];
 		[self updateIndicatorViewWithCurrentTabCell:lastTabCell nextTabCell:lastTabCell progress:1.0f axis:self.axis];
+        
+        NSIndexPath *indexPath = [NSIndexPath indexPathForRow:self.tabCount - 1 inSection:0];
+        [self setTabCellsInactiveExceptTabIndex:indexPath.row];
+        [self setTabCellActive:lastTabCell indexPath:indexPath];
+        [_collectionView selectItemAtIndexPath:indexPath animated:NO scrollPosition:UICollectionViewScrollPositionNone];
 	}
 	else { // update as required
 		if (progress != 0.0f) {
@@ -534,7 +562,9 @@ static CGFloat const MSSTabBarViewTabOffsetInvalid = -1.0f;
 			NSIndexPath *indexPath = [self.collectionView indexPathForCell:selectedCell];
 			
 			if (selectedCell && indexPath) {
-				[self setTabCellActive:selectedCell indexPath:indexPath];
+                [self setTabCellsInactiveExceptTabIndex:indexPath.row];
+                [self setTabCellActive:selectedCell indexPath:indexPath];
+                [_collectionView selectItemAtIndexPath:indexPath animated:NO scrollPosition:UICollectionViewScrollPositionNone];
 			}
 		}
 	}
