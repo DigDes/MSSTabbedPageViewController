@@ -78,6 +78,7 @@ NSInteger const MSSPageViewControllerPageNumberInvalid = -1;
     _showPageIndicator = NO;
     _allowScrollViewUpdates = YES;
     _scrollUpdatesEnabled = YES;
+	_scrollAnimationEnabled = YES;
     _infiniteScrollEnabled = NO;
     _currentPage = MSSPageViewControllerPageNumberInvalid;
 }
@@ -125,7 +126,7 @@ NSInteger const MSSPageViewControllerPageNumberInvalid = -1;
 
 - (void)moveToPageAtIndex:(NSInteger)index
                completion:(void (^)(UIViewController *, BOOL, BOOL))completion {
-    [self moveToPageAtIndex:index animated:YES completion:completion];
+    [self moveToPageAtIndex:index animated:self.scrollAnimationEnabled completion:completion];
 }
 
 - (void)moveToPageAtIndex:(NSInteger)index

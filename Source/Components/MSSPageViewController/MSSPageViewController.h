@@ -166,6 +166,10 @@ willDisplayInitialViewController:(nonnull UIViewController *)viewController;
  */
 @property (nonatomic, assign, getter=isScrollEnabled) BOOL scrollEnabled;
 /**
+ Whether animation of moving to new page enabled.
+ */
+@property (nonatomic, assign, getter=isScrollAnimationEnabled) BOOL scrollAnimationEnabled;
+/**
  Whether user interaction is allowed on the page view controller.
  */
 @property (nonatomic, assign) BOOL userInteractionEnabled;
