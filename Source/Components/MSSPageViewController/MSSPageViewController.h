@@ -147,12 +147,6 @@ willDisplayInitialViewController:(nonnull UIViewController *)viewController;
  The view controllers within the page view controller.
  */
 @property (nonatomic, strong, readonly, nullable) NSArray<UIViewController *> *viewControllers;
-
-/** 
- Whether page view controller will display the page indicator view.
- */
-@property (nonatomic, assign) BOOL showPageIndicator;
-
 /**
  Whether page view controller will provide delegate updates on scroll events.
  */

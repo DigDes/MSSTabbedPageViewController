@@ -76,7 +76,6 @@ defaultPageIndex = _defaultPageIndex;
 
 - (void)baseInit {
 	_provideOutOfBoundsUpdates = YES;
-	_showPageIndicator = NO;
 	_allowScrollViewUpdates = YES;
 	_scrollUpdatesEnabled = YES;
 	_scrollAnimationEnabled = YES;
@@ -437,20 +436,6 @@ defaultPageIndex = _defaultPageIndex;
 		}
 	}
 	return nil;
-}
-
-- (NSInteger)presentationCountForPageViewController:(UIPageViewController *)pageViewController {
-	if (self.showPageIndicator) {
-		return self.numberOfPages;
-	}
-	return 0;
-}
-
-- (NSInteger)presentationIndexForPageViewController:(UIPageViewController *)pageViewController {
-	if (self.showPageIndicator) {
-		return self.currentPage;
-	}
-	return 0;
 }
 
 #pragma mark - Page View Controller delegate
