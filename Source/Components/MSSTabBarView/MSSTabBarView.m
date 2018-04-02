@@ -207,7 +207,7 @@ static CGFloat const MSSTabBarViewTabOffsetInvalid = -1.0f;
 }
 
 - (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section {
-	return [self evaluateDataSource];
+    return [self evaluateDataSource] + self.numberOfInsertedTabs;
 }
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
@@ -276,10 +276,16 @@ static CGFloat const MSSTabBarViewTabOffsetInvalid = -1.0f;
 											   withHorizontalFittingPriority:UILayoutPriorityRequired
 											   verticalFittingPriority:UILayoutPriorityDefaultLow];
 		requiredSize.width = CGRectGetWidth(collectionView.bounds);
-		requiredSize.height = [MSSTabBarCollectionViewCell heightForText:self.sizingCell.title
-														   detailText:@""
-														   width:fittingSize.width
-														   font:[UIFont systemFontOfSize:14.0f]];
+        if (_tabHeight) {
+            requiredSize.height = _tabHeight;
+        }
+        else {
+            requiredSize.height = [MSSTabBarCollectionViewCell heightForText:self.sizingCell.title
+                                                               detailText:@""
+                                                               width:fittingSize.width
+                                                               font:[UIFont systemFontOfSize:14.0f]
+                                                               imageOffset:44.0f];
+        }
 		cellSize = requiredSize;
 	}
 	
@@ -507,6 +513,19 @@ static CGFloat const MSSTabBarViewTabOffsetInvalid = -1.0f;
 	[self.collectionView reloadData];
     _hasScrolledCollectionView = NO;
 }
+
+- (void)deleteAndInsertTabsAtIndexPaths:(NSArray *)itemPaths {
+    [self.collectionView performBatchUpdates:^{
+        if (self.isExpanded) {
+            self.isExpanded = NO;
+            [self.collectionView deleteItemsAtIndexPaths:itemPaths];
+        } else {
+            self.isExpanded = YES;
+            [self.collectionView insertItemsAtIndexPaths:itemPaths];
+        }
+    } completion:nil];
+}
+
 
 #pragma mark - Tab Bar State
 

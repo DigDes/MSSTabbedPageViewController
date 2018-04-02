@@ -111,6 +111,12 @@ __attribute__((deprecated("Use numberOfItemsForTabBarView and tabBarView:populat
  */
 @property (nonatomic, assign, readonly) NSInteger tabCount;
 
+@property (nonatomic) NSInteger numberOfInsertedTabs;
+
+@property (nonatomic) CGFloat tabHeight;
+
+@property (nonatomic) BOOL isExpanded;
+
 /**
  Whether the tab bar is currently animating a tab change transition.
  */
@@ -255,5 +261,7 @@ __attribute__((deprecated("Use numberOfItemsForTabBarView and tabBarView:populat
  Reload tab bar with new data.
  */
 - (void)reloadData;
+
+- (void)deleteAndInsertTabsAtIndexPaths:(NSArray *)itemPaths;
 
 @end
