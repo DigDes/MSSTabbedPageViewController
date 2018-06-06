@@ -264,4 +264,6 @@ __attribute__((deprecated("Use numberOfItemsForTabBarView and tabBarView:populat
 
 - (void)deleteAndInsertTabsAtIndexPaths:(NSArray *)itemPaths;
 
+- (MSSTabBarCollectionViewCell *)collectionViewCellAtTabIndex:(NSInteger)tabIndex;
+
 @end

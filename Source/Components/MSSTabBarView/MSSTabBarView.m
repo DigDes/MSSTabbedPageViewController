@@ -799,7 +799,7 @@ static CGFloat const MSSTabBarViewTabOffsetInvalid = -1.0f;
 }
 
 - (MSSTabBarCollectionViewCell *)collectionViewCellAtTabIndex:(NSInteger)tabIndex {
-	if (tabIndex >= 0 && tabIndex < self.tabCount) {
+	if (tabIndex >= 0 && tabIndex < self.tabCount + self.numberOfInsertedTabs) {
 		NSIndexPath *indexPath = [NSIndexPath indexPathForItem:tabIndex inSection:0];
 		[self.collectionView layoutIfNeeded];
 		return [self.collectionView cellForItemAtIndexPath:indexPath] ?: [self collectionView:self.collectionView cellForItemAtIndexPath:indexPath];

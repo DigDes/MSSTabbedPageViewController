@@ -319,6 +319,10 @@ static CGFloat const kTableViewCellMaxHeight = 70.0f;
                  } else {
                      self.tabBackgroundView.image = self.tabBackgroundViewImage;
                  }
+				 
+				 if (self.highlightedImage) {
+					 self.verticalImageTextImageView.image = isSelected ? self.highlightedImage : self.image;
+				 }
              } completion:nil];
         }
         
