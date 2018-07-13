@@ -9,6 +9,12 @@
 #import "TabViewController.h"
 #import "ChildViewController.h"
 
+@interface TabViewController () <MSSPageViewControllerDelegate, MSSPageViewControllerDataSource>
+@property (weak, nonatomic) IBOutlet UIView *tabBarContainerView;
+@property (weak, nonatomic) IBOutlet UIView *pageContainerView;
+
+@end
+
 @implementation TabViewController
 
 #pragma mark - Init
@@ -18,7 +24,7 @@
         _style = [TabControllerStyle styleWithName:@"Default"
                                           tabStyle:MSSTabStyleText
                                        sizingStyle:MSSTabSizingStyleSizeToFit
-                                      numberOfTabs:6];
+                                      numberOfTabs:8];
     }
     return self;
 }
@@ -42,12 +48,27 @@
     [self.tabBarView setTransitionStyle:self.style.transitionStyle];
     self.tabBarView.tabStyle = self.style.tabStyle;
     self.tabBarView.sizingStyle = self.style.sizingStyle;
-    
+    self.tabBarView.indicatorStyle = MSSIndicatorStyleImage;
+    self.tabBarView.indicatorAttributes = @{MSSTabIndicatorImage : [UIImage imageNamed:@"Indicator2"]};
     self.tabBarView.tabAttributes = @{NSFontAttributeName : [UIFont systemFontOfSize:16.0f weight:UIFontWeightThin],
                                       NSForegroundColorAttributeName : [UIColor blackColor],
                                       MSSTabTitleAlpha: @(0.1f)};
     self.tabBarView.selectedTabAttributes = @{NSFontAttributeName : [UIFont systemFontOfSize:16.0f weight:UIFontWeightMedium],
                                               NSForegroundColorAttributeName : self.view.tintColor};
+    [self.tabBarContainerView mss_addExpandingSubview:self.tabBarView];
+    [self.pageContainerView mss_addExpandingSubview:self.pageViewController.view];
+    self.tabBarView.delegate = self;
+    self.tabBarView.dataSource = self;
+    self.pageViewController.dataSource = self;
+    self.pageViewController.delegate = self;
+}
+
+- (void)traitCollectionDidChange:(UITraitCollection *)previousTraitCollection {
+    [super traitCollectionDidChange:previousTraitCollection];
+    if ((self.traitCollection.verticalSizeClass != previousTraitCollection.verticalSizeClass)
+        || (self.traitCollection.horizontalSizeClass != previousTraitCollection.horizontalSizeClass)) {
+        self.tabBarView.axis = self.traitCollection.horizontalSizeClass == UIUserInterfaceSizeClassRegular ? UILayoutConstraintAxisVertical : UILayoutConstraintAxisHorizontal;
+    }
 }
 
 #pragma mark - Interaction
