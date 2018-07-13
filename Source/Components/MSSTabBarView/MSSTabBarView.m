@@ -618,15 +618,17 @@ static CGFloat const MSSTabBarViewTabOffsetInvalid = -1.0f;
 	
 	cell.selectionProgress = 1.0f;
 	
-	if (self.animateDataSourceTransition) {
-		[UIView animateWithDuration:0.25f animations:^{
-			[self updateIndicatorViewFrameWithXOrigin:cell.frame.origin.x andWidth:cell.frame.size.width accountForPadding:YES axis:self.axis];
-		}];
-	}
-	else {
-		CGFloat origin = self.axis == UILayoutConstraintAxisVertical ? cell.frame.origin.y : cell.frame.origin.x;
-		CGFloat size = self.axis == UILayoutConstraintAxisVertical ? cell.frame.size.height : cell.frame.size.width;
-		[self updateIndicatorViewFrameWithXOrigin:origin andWidth:size accountForPadding:YES axis:self.axis];
+	if (self.indicatorStyle != MSSIndicatorDisabled) {
+		if (self.animateDataSourceTransition) {
+			[UIView animateWithDuration:0.25f animations:^{
+				[self updateIndicatorViewFrameWithXOrigin:cell.frame.origin.x andWidth:cell.frame.size.width accountForPadding:YES axis:self.axis];
+			}];
+		}
+		else {
+			CGFloat origin = self.axis == UILayoutConstraintAxisVertical ? cell.frame.origin.y : cell.frame.origin.x;
+			CGFloat size = self.axis == UILayoutConstraintAxisVertical ? cell.frame.size.height : cell.frame.size.width;
+			[self updateIndicatorViewFrameWithXOrigin:origin andWidth:size accountForPadding:YES axis:self.axis];
+		}
 	}
 }
 
@@ -961,6 +963,7 @@ static CGFloat const MSSTabBarViewTabOffsetInvalid = -1.0f;
 	
 	UIView *indicatorView;
 	switch (indicatorStyle) {
+		case MSSIndicatorDisabled: break;
 		case MSSIndicatorStyleLine: {
 			UIView *indicatorLineView = [UIView new];
 			[self.indicatorContainer addSubview:indicatorLineView];
@@ -976,9 +979,6 @@ static CGFloat const MSSTabBarViewTabOffsetInvalid = -1.0f;
 			
 			indicatorView = imageView;
 		}
-			break;
-		
-		default:
 			break;
 	}
 	
@@ -1027,6 +1027,10 @@ static CGFloat const MSSTabBarViewTabOffsetInvalid = -1.0f;
 	
 	CGFloat height = 0.0f;
 	switch (self.indicatorStyle) {
+		case MSSIndicatorDisabled:
+			height = 0.0f;
+			break;
+			
 		case MSSIndicatorStyleLine:
 			height = self.lineIndicatorHeight;
 			break;
