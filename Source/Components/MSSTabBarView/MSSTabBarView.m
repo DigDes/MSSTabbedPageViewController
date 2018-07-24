@@ -207,7 +207,7 @@ static CGFloat const MSSTabBarViewTabOffsetInvalid = -1.0f;
 }
 
 - (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section {
-    return [self evaluateDataSource] + self.numberOfInsertedTabs;
+	return [self evaluateDataSource];
 }
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
@@ -801,7 +801,7 @@ static CGFloat const MSSTabBarViewTabOffsetInvalid = -1.0f;
 }
 
 - (MSSTabBarCollectionViewCell *)collectionViewCellAtTabIndex:(NSInteger)tabIndex {
-	if (tabIndex >= 0 && tabIndex < self.tabCount + self.numberOfInsertedTabs) {
+	if (tabIndex >= 0 && tabIndex < self.tabCount) {
 		NSIndexPath *indexPath = [NSIndexPath indexPathForItem:tabIndex inSection:0];
 		[self.collectionView layoutIfNeeded];
 		return [self.collectionView cellForItemAtIndexPath:indexPath] ?: [self collectionView:self.collectionView cellForItemAtIndexPath:indexPath];

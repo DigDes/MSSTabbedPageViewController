@@ -112,8 +112,6 @@ __attribute__((deprecated("Use numberOfItemsForTabBarView and tabBarView:populat
  */
 @property (nonatomic, assign, readonly) NSInteger tabCount;
 
-@property (nonatomic) NSInteger numberOfInsertedTabs;
-
 @property (nonatomic) CGFloat tabHeight;
 
 @property (nonatomic) BOOL isExpanded;
