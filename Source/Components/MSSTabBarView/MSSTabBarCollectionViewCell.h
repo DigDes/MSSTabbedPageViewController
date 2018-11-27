@@ -24,6 +24,8 @@
 
 @property (nonatomic, strong, nullable) UIImage *tabBackgroundViewImage;
 
+@property (nonatomic) CGFloat tabAlpha;
+
 /**
  The image displayed in the tab cell.
  

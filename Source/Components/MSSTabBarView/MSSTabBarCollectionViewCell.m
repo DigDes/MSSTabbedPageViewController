@@ -67,8 +67,8 @@
 #pragma mark - Public
 
 - (void)setTitle:(NSString *)title {
-    self.textTitleLabel.text = title;
-    self.imageTextTitleLabel.text = title;
+	self.textTitleLabel.text = title;
+	self.imageTextTitleLabel.text = title;
 	self.verticalImageTextTitleLabel.text = title;
 }
 
@@ -106,6 +106,19 @@
 		self.imageTextImageView.highlightedImage = highlightedImage;
 		self.verticalImageTextImageView.highlightedImage = highlightedImage;
 	}
+}
+
+- (CGFloat)tabAlpha {
+	return self.textTitleLabel.alpha;
+}
+
+- (void)setTabAlpha:(CGFloat)tabAlpha {
+	self.textTitleLabel.alpha = tabAlpha;
+	self.imageTextTitleLabel.alpha = tabAlpha;
+	self.verticalImageTextTitleLabel.alpha = tabAlpha;
+	self.imageImageView.alpha = tabAlpha;
+	self.imageTextImageView.alpha = tabAlpha;
+	self.verticalImageTextImageView.alpha = tabAlpha;
 }
 
 static CGFloat const kTableViewCellMinHeight = 44.0f;
