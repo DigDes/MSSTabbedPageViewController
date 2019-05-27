@@ -104,7 +104,6 @@
 	if (self.tabStyle == MSSTabStyleImage || self.tabStyle == MSSTabStyleImageAndText) {
 		self.imageImageView.highlightedImage = highlightedImage;
 		self.imageTextImageView.highlightedImage = highlightedImage;
-		self.verticalImageTextImageView.highlightedImage = highlightedImage;
 	}
 }
 
