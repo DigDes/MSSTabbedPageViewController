@@ -119,10 +119,12 @@ static CGFloat const MSSTabBarViewTabOffsetInvalid = -1.0f;
 	// Collection view
 	UICollectionViewFlowLayout *layout = [UICollectionViewFlowLayout new];
 	[layout setScrollDirection:UICollectionViewScrollDirectionHorizontal];
+	layout.sectionInsetReference = UICollectionViewFlowLayoutSectionInsetFromSafeArea;
 	_collectionView = [[UICollectionView alloc] initWithFrame:CGRectZero collectionViewLayout:layout];
 	_collectionView.dataSource = self;
 	_collectionView.delegate = self;
 	_collectionView.prefetchingEnabled = NO;
+	_collectionView.contentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentNever;
 	self.scrollEnabled = MSSTabBarViewDefaultScrollEnabled;
 	_tabTextColor = [UIColor blackColor];
 	
