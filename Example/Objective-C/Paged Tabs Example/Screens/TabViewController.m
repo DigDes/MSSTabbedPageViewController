@@ -24,7 +24,7 @@
         _style = [TabControllerStyle styleWithName:@"Default"
                                           tabStyle:MSSTabStyleText
                                        sizingStyle:MSSTabSizingStyleSizeToFit
-                                      numberOfTabs:6];
+                                      numberOfTabs:8];
     }
     return self;
 }
@@ -48,7 +48,8 @@
     [self.tabBarView setTransitionStyle:self.style.transitionStyle];
     self.tabBarView.tabStyle = self.style.tabStyle;
     self.tabBarView.sizingStyle = self.style.sizingStyle;
-    
+    self.tabBarView.indicatorStyle = MSSIndicatorStyleImage;
+    self.tabBarView.indicatorAttributes = @{MSSTabIndicatorImage : [UIImage imageNamed:@"Indicator2"]};
     self.tabBarView.tabAttributes = @{NSFontAttributeName : [UIFont systemFontOfSize:16.0f weight:UIFontWeightThin],
                                       NSForegroundColorAttributeName : [UIColor blackColor],
                                       MSSTabTitleAlpha: @(0.1f)};

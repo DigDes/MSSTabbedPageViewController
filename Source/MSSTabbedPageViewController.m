@@ -71,10 +71,10 @@
         self.pageViewController.userInteractionEnabled = NO;
         
         [self.tabBarView setTabIndex:index animated:YES];
-        typeof(self) __weak weakSelf = self;
+        __weak __typeof(self) weakSelf = self;
         [self.pageViewController moveToPageAtIndex:index
                      completion:^(UIViewController *newViewController, BOOL animated, BOOL transitionFinished) {
-                         typeof(weakSelf) __strong strongSelf = weakSelf;
+                         __strong __typeof(weakSelf) strongSelf = weakSelf;
                          strongSelf.pageViewController.allowScrollViewUpdates = YES;
                          strongSelf.pageViewController.userInteractionEnabled = YES;
                      }];

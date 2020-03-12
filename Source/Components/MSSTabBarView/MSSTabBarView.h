@@ -251,4 +251,9 @@ __attribute__((deprecated("Use numberOfItemsForTabBarView and tabBarView:populat
  */
 - (void)setTransitionStyle:(MSSTabTransitionStyle)transitionStyle;
 
+/**
+ Reload tab bar with new data.
+ */
+- (void)reloadData;
+
 @end

@@ -27,6 +27,7 @@
 
 @property (nonatomic, weak) IBOutlet UIView *verticalImageTextContainerView;
 @property (nonatomic, weak) IBOutlet UILabel *verticalImageTextTitleLabel;
+@property (nonatomic, weak) IBOutlet UILabel *verticalImageTextDetailTitleLabel;
 @property (nonatomic, weak) IBOutlet UIImageView *verticalImageTextImageView;
 
 @property (nonatomic, weak) IBOutlet NSLayoutConstraint *containerViewBottomMargin;
@@ -56,6 +57,12 @@
     _alphaEffectEnabled = YES; // alpha effect enabled by default
 }
 
+- (void)prepareForReuse {
+	[super prepareForReuse];
+	self.verticalImageTextImageView.image = nil;
+	self.verticalImageTextImageView.highlightedImage = nil;
+}
+
 #pragma mark - Public
 
 - (void)setTitle:(NSString *)title {
@@ -68,6 +75,14 @@
     return self.textTitleLabel.text;
 }
 
+-(void)setDetailText:(NSString *)detailText {
+	self.verticalImageTextDetailTitleLabel.text = detailText;
+}
+
+- (NSString *)detailText {
+	return self.verticalImageTextDetailTitleLabel.text;
+}
+
 - (void)setImage:(UIImage *)image {
     if (self.tabStyle == MSSTabStyleImage || self.tabStyle == MSSTabStyleImageAndText) {
         self.imageImageView.image = image;
@@ -78,6 +93,60 @@
 
 - (UIImage *)image {
     return self.imageImageView.image;
+}
+
+- (UIImage *)highlightedImage {
+	return self.imageImageView.highlightedImage;
+}
+
+- (void)setHighlightedImage:(UIImage *)highlightedImage {
+	if (self.tabStyle == MSSTabStyleImage || self.tabStyle == MSSTabStyleImageAndText) {
+		self.imageImageView.highlightedImage = highlightedImage;
+		self.imageTextImageView.highlightedImage = highlightedImage;
+		self.verticalImageTextImageView.highlightedImage = highlightedImage;
+	}
+}
+
+static CGFloat const kTableViewCellMinHeight = 44.0f;
+static CGFloat const kTableViewCellMaxHeight = 70.0f;
+
++ (CGFloat)heightForText:(NSString *)aText detailText:(NSString *)detailText width:(CGFloat)width font:(UIFont *)font {
+	NSMutableParagraphStyle *paragraphStyle = [[NSMutableParagraphStyle alloc] init];
+	paragraphStyle.lineBreakMode = NSLineBreakByWordWrapping;
+	
+	NSDictionary *attributes = @{NSFontAttributeName: font, NSParagraphStyleAttributeName: paragraphStyle};
+	
+	CGFloat imageOffset = 44.0f;
+	
+//	if ([AppSettings instance].customerSpecificSettingsMPT && ![AppSettings instance].customerSpecificSettingsMPT_Minister) {
+//		imageOffset = 49.0f;
+//	}
+	CGRect rect = [aText boundingRectWithSize:CGSizeMake(width - imageOffset, MAXFLOAT)
+									  options:NSStringDrawingUsesLineFragmentOrigin
+								   attributes:attributes
+									  context:nil];
+	if (detailText.length > 0) {
+		if (CGRectGetHeight(rect) < 22.0f) {
+			return kTableViewCellMinHeight;
+		}
+		else if (CGRectGetHeight(rect) >= 22.0f && CGRectGetHeight(rect) < 48.0f) {
+			return CGRectGetHeight(rect) + 22.0f;
+		}
+		else {
+			return kTableViewCellMaxHeight;
+		}
+	}
+	else {
+		if (CGRectGetHeight(rect) < 35.0f) {
+			return kTableViewCellMinHeight;
+		}
+		else if (CGRectGetHeight(rect) >= 35.0f && CGRectGetHeight(rect) < 57.0f) {
+			return CGRectGetHeight(rect) + 13.0f;
+		}
+		else {
+			return kTableViewCellMaxHeight;
+		}
+	}
 }
 
 #pragma mark - Private
@@ -97,6 +166,9 @@
         self.textTitleLabel.textColor = selectedTextColor;
         self.imageTextTitleLabel.textColor = selectedTextColor;
 		self.verticalImageTextTitleLabel.textColor = selectedTextColor;
+		self.imageImageView.tintColor = selectedTextColor;
+		self.imageTextImageView.tintColor = selectedTextColor;
+		self.verticalImageTextImageView.tintColor = selectedTextColor;
     }
 }
 
@@ -123,21 +195,21 @@
     
     switch (tabStyle) {
         case MSSTabStyleImageAndText:
-            self.textContainerView.hidden = YES;
-            self.imageContainerView.hidden = YES;
+            [self.textContainerView removeFromSuperview];
+			[self.imageContainerView removeFromSuperview];
             self.imageTextContainerView.hidden = NO;
             break;
             
         case MSSTabStyleImage:
-            self.textContainerView.hidden = YES;
+			[self.textContainerView removeFromSuperview];
             self.imageContainerView.hidden = NO;
-            self.imageTextContainerView.hidden = YES;
+            [self.imageTextContainerView removeFromSuperview];
             break;
             
         default:
             self.textContainerView.hidden = NO;
-            self.imageContainerView.hidden = YES;
-            self.imageTextContainerView.hidden = YES;
+            [self.imageContainerView removeFromSuperview];
+            [self.imageTextContainerView removeFromSuperview];
             break;
     }
 }
@@ -161,10 +233,14 @@
 }
 
 - (void)setSelectionProgress:(CGFloat)selectionProgress {
-    _selectionProgress = selectionProgress;
-    
-    [self updateProgressiveAppearance];
-    [self updateSelectionAppearance];
+	[self setSelectionProgress:selectionProgress animated:YES];
+}
+
+- (void)setSelectionProgress:(CGFloat)selectionProgress animated:(BOOL)animated {
+	_selectionProgress = selectionProgress;
+	
+	[self updateProgressiveAppearance];
+	[self updateSelectionAppearanceAnimated:animated];
 }
 
 - (void)setAlphaEffectEnabled:(BOOL)alphaEffectEnabled {
@@ -196,13 +272,13 @@
     }
 }
 
-- (void)updateSelectionAppearance {
+- (void)updateSelectionAppearanceAnimated:(BOOL)animated {
     BOOL isSelected = (self.selectionProgress == 1.0f);
     if (_isSelected != isSelected) { // update selected state
         
         if (self.selectedTextFont || self.selectedTextColor) {
             [UIView transitionWithView:self
-                              duration:0.2f
+                              duration:animated ? 0.2f : 0.0f
                                options:UIViewAnimationOptionTransitionCrossDissolve
                             animations:
              ^{
@@ -233,12 +309,14 @@
                  } else {
                      self.backgroundColor = self.tabBackgroundColor;
                  }
-                 
              } completion:nil];
         }
         
         _isSelected = isSelected;
         self.selected = isSelected;
+		self.imageImageView.highlighted = isSelected;
+		self.imageTextImageView.highlighted = isSelected;
+		self.verticalImageTextImageView.highlighted = isSelected;
     }
 }
 
