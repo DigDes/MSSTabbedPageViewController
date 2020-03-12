@@ -4,9 +4,13 @@ PODS:
 DEPENDENCIES:
   - PureLayout
 
+SPEC REPOS:
+  trunk:
+    - PureLayout
+
 SPEC CHECKSUMS:
   PureLayout: f35f5384c9c4e4479df041dbe33ad7577b71ddfb
 
 PODFILE CHECKSUM: 3e4ca40adb2f47850140e1399707d071dec0bb8f
 
-COCOAPODS: 1.0.1
+COCOAPODS: 1.9.1

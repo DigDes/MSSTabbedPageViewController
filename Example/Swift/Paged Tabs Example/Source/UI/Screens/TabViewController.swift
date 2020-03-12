@@ -9,25 +9,24 @@
 import UIKit
 import MSSTabbedPageViewController
 
-class TabViewController: MSSTabbedPageViewController {
-    
+class TabViewController: MSSTabbedPageViewController, MSSPageViewControllerDataSource {
+
     // MARK: MSSPageViewControllerDataSource
-    
-    override func viewControllersForPageViewController(pageViewController: MSSPageViewController) -> [UIViewController]? {
-        let storyboard = UIStoryboard(name: "Main", bundle: NSBundle.mainBundle())
+
+    func viewControllers(for pageViewController: MSSPageViewController) -> [UIViewController]? {
+        let storyboard = UIStoryboard(name: "Main", bundle: Bundle.main)
         
-        let viewControllers = [storyboard.instantiateViewControllerWithIdentifier("ChildViewController"),
-                               storyboard.instantiateViewControllerWithIdentifier("ChildViewController"),
-                               storyboard.instantiateViewControllerWithIdentifier("ChildViewController"),
-                               storyboard.instantiateViewControllerWithIdentifier("ChildViewController"),
-                               storyboard.instantiateViewControllerWithIdentifier("ChildViewController")]
+        let viewControllers = [storyboard.instantiateViewController(withIdentifier: "ChildViewController"),
+                               storyboard.instantiateViewController(withIdentifier: "ChildViewController"),
+                               storyboard.instantiateViewController(withIdentifier: "ChildViewController"),
+                               storyboard.instantiateViewController(withIdentifier: "ChildViewController"),
+                               storyboard.instantiateViewController(withIdentifier: "ChildViewController")]
         return viewControllers
     }
-    
+
     // MARK: MSSTabBarViewDataSource
-    
-    override func tabBarView(tabBarView: MSSTabBarView, populateTab tab: MSSTabBarCollectionViewCell, atIndex index: Int) {
-        
+
+    func tabBarView(tabBarView: MSSTabBarView, populateTab tab: MSSTabBarCollectionViewCell, atIndex index: Int) {
         tab.title = String(format: "Page %d", index + 1)
     }
 }

@@ -1,16 +1,16 @@
 PODS:
-  - MSSTabbedPageViewController (0.3.6)
+  - MSSTabbedPageViewController (0.5.1)
 
 DEPENDENCIES:
   - MSSTabbedPageViewController (from `../../`)
 
 EXTERNAL SOURCES:
   MSSTabbedPageViewController:
-    :path: ../../
+    :path: "../../"
 
 SPEC CHECKSUMS:
-  MSSTabbedPageViewController: 5b9b64250f25ee6a05c45702b3c251843818147b
+  MSSTabbedPageViewController: 9e50c9a7340de75b561f555d8c7d23405196b4e5
 
 PODFILE CHECKSUM: 1f7f2561a204ec5f8d03bd3a20ad12e2e6514322
 
-COCOAPODS: 1.0.1
+COCOAPODS: 1.9.1

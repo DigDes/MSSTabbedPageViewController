@@ -33,7 +33,7 @@ NSInteger const MSSPageViewControllerPageNumberInvalid = -1;
 }
 
 - (NSInteger)pageIndex {
-    return [objc_getAssociatedObject(self, @selector(pageIndex))integerValue];
+    return [objc_getAssociatedObject(self, @selector(pageIndex)) integerValue];
 }
 
 @end
@@ -41,6 +41,7 @@ NSInteger const MSSPageViewControllerPageNumberInvalid = -1;
 
 @interface MSSPageViewController () <UIPageViewControllerDataSource, UIPageViewControllerDelegate> {
     BOOL _viewHasLoaded;
+    BOOL _isScrollEnabled;
 }
 
 @property (nonatomic, strong) UIPageViewController *pageViewController;
@@ -75,10 +76,11 @@ NSInteger const MSSPageViewControllerPageNumberInvalid = -1;
 
 - (void)baseInit {
     _provideOutOfBoundsUpdates = YES;
-    _showPageIndicator = NO;
     _allowScrollViewUpdates = YES;
     _scrollUpdatesEnabled = YES;
+    _scrollAnimationEnabled = YES;
     _infiniteScrollEnabled = NO;
+    _isScrollEnabled = YES;
     _currentPage = MSSPageViewControllerPageNumberInvalid;
 }
 
@@ -88,7 +90,7 @@ NSInteger const MSSPageViewControllerPageNumberInvalid = -1;
     [super loadView];
     
     if (!_pageViewController) {
-        self.pageViewController = [[UIPageViewController alloc]initWithTransitionStyle:UIPageViewControllerTransitionStyleScroll
+        self.pageViewController = [[UIPageViewController alloc] initWithTransitionStyle:UIPageViewControllerTransitionStyleScroll
                                                                   navigationOrientation:UIPageViewControllerNavigationOrientationHorizontal
                                                                                 options:nil];
         self.pageViewController.dataSource = self;
@@ -101,20 +103,23 @@ NSInteger const MSSPageViewControllerPageNumberInvalid = -1;
     _viewHasLoaded = YES;
     
     [self.pageViewController mss_addToParentViewController:self atZIndex:0];
+    self.scrollEnabled = _isScrollEnabled;
     self.scrollView.delegate = self;
+    [self.scrollView.panGestureRecognizer requireGestureRecognizerToFail:self.navigationController.interactivePopGestureRecognizer];
     
     [self setUpPages];
 }
 
 - (void)viewWillTransitionToSize:(CGSize)size
-       withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator {
+       withTransitionCoordinator:(id <UIViewControllerTransitionCoordinator>)coordinator {
     
     // disable scroll updates during rotation
     self.scrollUpdatesEnabled = NO;
     [super viewWillTransitionToSize:size withTransitionCoordinator:coordinator];
-    [coordinator animateAlongsideTransition:nil completion:^(id<UIViewControllerTransitionCoordinatorContext>  _Nonnull context) {
-        self.scrollUpdatesEnabled = YES;
-    }];
+    [coordinator animateAlongsideTransition:nil
+                                 completion:^(id <UIViewControllerTransitionCoordinatorContext> _Nonnull context) {
+                                     self.scrollUpdatesEnabled = YES;
+                                 }];
 }
 
 #pragma mark - Public
@@ -125,7 +130,7 @@ NSInteger const MSSPageViewControllerPageNumberInvalid = -1;
 
 - (void)moveToPageAtIndex:(NSInteger)index
                completion:(void (^)(UIViewController *, BOOL, BOOL))completion {
-    [self moveToPageAtIndex:index animated:YES completion:completion];
+    [self moveToPageAtIndex:index animated:self.scrollAnimationEnabled completion:completion];
 }
 
 - (void)moveToPageAtIndex:(NSInteger)index
@@ -141,7 +146,8 @@ NSInteger const MSSPageViewControllerPageNumberInvalid = -1;
             self.infiniteScrollPagingBehaviour == MSSPageViewControllerInfinitePagingBehaviorStandard) {
             if (index == 0 && self.currentPage == self.viewControllers.count - 1) { // moving to first page
                 isForwards = YES;
-            } else if (index == self.viewControllers.count - 1 && self.currentPage == 0) { // moving to last page
+            } else if (index == self.viewControllers.count - 1 &&
+                       self.currentPage == 0) { // moving to last page
                 isForwards = NO;
             }
         }
@@ -149,12 +155,14 @@ NSInteger const MSSPageViewControllerPageNumberInvalid = -1;
         UIViewController *viewController = [self viewControllerAtIndex:index];
         UIPageViewControllerNavigationDirection direction = isForwards ? UIPageViewControllerNavigationDirectionForward : UIPageViewControllerNavigationDirectionReverse;
         
-        typeof(self) __weak weakSelf = self;
+        [self pageViewController:self.pageViewController willTransitionToViewControllers:@[viewController]];
+        
+        __weak __typeof(self) weakSelf = self;
         [self.pageViewController setViewControllers:@[viewController]
                                           direction:direction
                                            animated:animated
                                          completion:^(BOOL finished) {
-                                             typeof(weakSelf) __strong strongSelf = weakSelf;
+                                             __strong __typeof(weakSelf) strongSelf = weakSelf;
                                              [strongSelf updateCurrentPage:index];
                                              if (completion) {
                                                  completion(viewController, animated, finished);
@@ -172,11 +180,12 @@ NSInteger const MSSPageViewControllerPageNumberInvalid = -1;
 }
 
 - (void)setScrollEnabled:(BOOL)scrollEnabled {
+    _isScrollEnabled = scrollEnabled;
     self.scrollView.scrollEnabled = scrollEnabled;
 }
 
 - (BOOL)isScrollEnabled {
-    return self.scrollView.scrollEnabled;
+    return _isScrollEnabled;
 }
 
 - (void)setUserInteractionEnabled:(BOOL)userInteractionEnabled {
@@ -187,21 +196,21 @@ NSInteger const MSSPageViewControllerPageNumberInvalid = -1;
     return self.pageViewController.view.userInteractionEnabled;
 }
 
-- (void)setDataSource:(id<MSSPageViewControllerDataSource>)dataSource {
+- (void)setDataSource:(id <MSSPageViewControllerDataSource>)dataSource {
     if (_viewHasLoaded && dataSource != self.dataSource) {
         _dataSource = dataSource;
         [self setUpPages];
     }
 }
 
-- (id<MSSPageViewControllerDataSource>)dataSource {
+- (id <MSSPageViewControllerDataSource>)dataSource {
     if (_dataSource) {
         return _dataSource;
     }
     return self;
 }
 
-- (id<MSSPageViewControllerDelegate>)delegate {
+- (id <MSSPageViewControllerDelegate>)delegate {
     if (_delegate) {
         return _delegate;
     }
@@ -209,7 +218,8 @@ NSInteger const MSSPageViewControllerPageNumberInvalid = -1;
 }
 
 - (NSInteger)defaultPageIndex {
-    if (_defaultPageIndex == 0 && [self.dataSource respondsToSelector:@selector(defaultPageIndexForPageViewController:)]) {
+    if (_defaultPageIndex == 0 &&
+        [self.dataSource respondsToSelector:@selector(defaultPageIndexForPageViewController:)]) {
         _defaultPageIndex = [self.dataSource defaultPageIndexForPageViewController:self];
     }
     return _defaultPageIndex;
@@ -285,7 +295,7 @@ NSInteger const MSSPageViewControllerPageNumberInvalid = -1;
     if (!_scrollView) {
         for (UIView *subview in self.pageViewController.view.subviews) {
             if ([subview isKindOfClass:[UIScrollView class]]) {
-                _scrollView = (UIScrollView *)subview;
+                _scrollView = (UIScrollView *) subview;
                 break;
             }
         }
@@ -348,7 +358,7 @@ NSInteger const MSSPageViewControllerPageNumberInvalid = -1;
     }
     
     if (currentPagePosition != self.previousPagePosition) {
-
+        
         CGFloat minPagePosition = 0.0f;
         CGFloat maxPagePosition = (self.viewControllers.count - 1);
         
@@ -432,20 +442,6 @@ NSInteger const MSSPageViewControllerPageNumberInvalid = -1;
     return nil;
 }
 
-- (NSInteger)presentationCountForPageViewController:(UIPageViewController *)pageViewController {
-    if (self.showPageIndicator) {
-        return self.numberOfPages;
-    }
-    return 0;
-}
-
-- (NSInteger)presentationIndexForPageViewController:(UIPageViewController *)pageViewController {
-    if (self.showPageIndicator) {
-        return self.currentPage;
-    }
-    return 0;
-}
-
 #pragma mark - Page View Controller delegate
 
 - (void)pageViewController:(UIPageViewController *)pageViewController
@@ -470,6 +466,13 @@ willTransitionToViewControllers:(NSArray<UIViewController *> *)pendingViewContro
         NSInteger index = [self indexOfViewController:pageViewController.viewControllers.firstObject];
         if (index != NSNotFound) {
             [self updateCurrentPage:index];
+        }
+    } else {
+        NSInteger index = [self indexOfViewController:pageViewController.viewControllers.firstObject];
+        if (index != NSNotFound) {
+            if ([self.delegate respondsToSelector:@selector(pageViewController:didScrollToPage:)]) {
+                [self.delegate pageViewController:self didScrollToPage:index];
+            }
         }
     }
 }

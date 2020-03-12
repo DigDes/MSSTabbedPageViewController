@@ -7,12 +7,13 @@
 //
 
 #import "ChildViewController.h"
+#import <MSSTabbedPageViewController/MSSTabbedPageViewController.h>
 
 @implementation ChildViewController
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    self.titleLabel.text = [NSString stringWithFormat:@"Page %i", (int)(self.pageIndex + 1)];
+    _titleLabel.text = [NSString stringWithFormat:@"Page %i", (int)(self.pageIndex + 1)];
 }
 
 @end

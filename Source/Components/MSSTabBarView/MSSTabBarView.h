@@ -18,6 +18,7 @@ typedef NS_ENUM(NSInteger, MSSTabTransitionStyle) {
 };
 
 typedef NS_ENUM(NSInteger, MSSIndicatorStyle) {
+    MSSIndicatorDisabled = -1,
     MSSIndicatorStyleLine,
     MSSIndicatorStyleImage
 };
@@ -25,6 +26,7 @@ typedef NS_ENUM(NSInteger, MSSIndicatorStyle) {
 extern CGFloat const MSSTabBarViewDefaultHeight;
 
 @class MSSTabBarView;
+
 @protocol MSSTabBarViewDataSource <NSObject>
 
 @required
@@ -100,16 +102,20 @@ __attribute__((deprecated("Use numberOfItemsForTabBarView and tabBarView:populat
 /**
  The object that acts as the data source for the tab bar.
  */
-@property (nonatomic, weak, nullable) IBOutlet id<MSSTabBarViewDataSource> dataSource;
+@property (nonatomic, weak, nullable) IBOutlet id <MSSTabBarViewDataSource> dataSource;
 /**
  The object that acts as a delegate for the tab bar.
  */
-@property (nonatomic, weak, nullable) IBOutlet id<MSSTabBarViewDelegate> delegate;
+@property (nonatomic, weak, nullable) IBOutlet id <MSSTabBarViewDelegate> delegate;
 
 /**
  The number of tabs in the tab bar.
  */
 @property (nonatomic, assign, readonly) NSInteger tabCount;
+
+@property (nonatomic) CGFloat tabHeight;
+
+@property (nonatomic) BOOL isExpanded;
 
 /**
  Whether the tab bar is currently animating a tab change transition.
@@ -134,6 +140,11 @@ __attribute__((deprecated("Use numberOfItemsForTabBarView and tabBarView:populat
  */
 @property (nonatomic, assign) UIEdgeInsets contentInset UI_APPEARANCE_SELECTOR;
 
+/* A stack with a horizontal axis is a row of arrangedSubviews,
+ and a stack with a vertical axis is a column of arrangedSubviews.
+ */
+@property (nonatomic) UILayoutConstraintAxis axis UI_APPEARANCE_SELECTOR;
+
 /**
  The sizing style to use for tabs in the tab bar.
  
@@ -156,6 +167,8 @@ __attribute__((deprecated("Use numberOfItemsForTabBarView and tabBarView:populat
  MSSIndicatorStyleLine - use a coloured line as the indicator (default).
  
  MSSIndicatorStyleImage - use an image as the indicator.
+ 
+ MSSIndicatorDisabled - disable and hide indicator.
  */
 @property (nonatomic, assign) MSSIndicatorStyle indicatorStyle UI_APPEARANCE_SELECTOR;
 
@@ -231,6 +244,7 @@ __attribute__((deprecated("Use numberOfItemsForTabBarView and tabBarView:populat
  Animate the tab index transition.
  */
 - (void)setTabIndex:(NSInteger)index animated:(BOOL)animated;
+
 /**
  Set the data source of the tab bar.
  
@@ -239,11 +253,20 @@ __attribute__((deprecated("Use numberOfItemsForTabBarView and tabBarView:populat
  @param animated
  Animate the data source transition.
  */
-- (void)setDataSource:(nullable id<MSSTabBarViewDataSource>)dataSource animated:(BOOL)animated;
+- (void)setDataSource:(nullable id <MSSTabBarViewDataSource>)dataSource animated:(BOOL)animated;
 
 /**
  Set the tab and selection indicator transition style.
  */
 - (void)setTransitionStyle:(MSSTabTransitionStyle)transitionStyle;
+
+/**
+ Reload tab bar with new data.
+ */
+- (void)reloadData;
+
+- (void)deleteAndInsertTabsAtIndexPaths:(nonnull NSArray *)itemPaths;
+
+- (nullable MSSTabBarCollectionViewCell *)collectionViewCellAtTabIndex:(NSInteger)tabIndex;
 
 @end

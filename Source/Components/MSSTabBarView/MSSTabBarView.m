@@ -11,29 +11,35 @@
 #import "UIView+MSSAutoLayout.h"
 #import "MSSTabBarCollectionViewCell+Private.h"
 
+
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
 
-NSString *  const MSSTabBarViewCellIdentifier = @"tabCell";
+static NSString *const MSSTabBarViewCellIdentifier = @"MSSTabBarCollectionViewCell";
+static NSString *const MSSTabBarViewTextCellIdentifier = @"MSSTabBarTextCollectionViewCell";
 
 // defaults
-CGFloat     const MSSTabBarViewDefaultHeight = 44.0f;
-CGFloat     const MSSTabBarViewDefaultTabIndicatorHeight = 2.0f;
-CGFloat     const MSSTabBarViewDefaultTabPadding = 8.0f;
-CGFloat     const MSSTabBarViewDefaultTabUnselectedAlpha = 0.3f;
-CGFloat     const MSSTabBarViewDefaultHorizontalContentInset = 8.0f;
-NSString *  const MSSTabBarViewDefaultTabTitleFormat = @"Tab %li";
-BOOL        const MSSTabBarViewDefaultScrollEnabled = NO;
+CGFloat const MSSTabBarViewDefaultHeight = 44.0f;
 
-NSInteger   const MSSTabBarViewMaxDistributedTabs = 5;
-CGFloat     const MSSTabBarViewTabTransitionSnapRatio = 0.5f;
+static CGFloat const MSSTabBarViewDefaultCellWidthForVerticalAxis = 222.0f;
+static CGFloat const MSSTabBarViewDefaultCellWidthForHorisontalAxis = 60.0f;
+static CGFloat const MSSTabBarViewDefaultTabIndicatorHeight = 2.0f;
+static CGFloat const MSSTabBarViewDefaultTabPadding = 8.0f;
+static CGFloat const MSSTabBarViewDefaultTabUnselectedAlpha = 0.3f;
+static CGFloat const MSSTabBarViewDefaultHorizontalContentInset = 8.0f;
+static NSString *const MSSTabBarViewDefaultTabTitleFormat = @"Tab %li";
+static BOOL const MSSTabBarViewDefaultScrollEnabled = YES;
 
-CGFloat     const MSSTabBarViewTabOffsetInvalid = -1.0f;
+static NSInteger const MSSTabBarViewDefaultMaxDistributedTabs = 5;
+static CGFloat const MSSTabBarViewTabTransitionSnapRatio = 0.5f;
+
+static CGFloat const MSSTabBarViewTabOffsetInvalid = -1.0f;
 
 @interface MSSTabBarView () <UICollectionViewDataSource, UICollectionViewDelegateFlowLayout>
 
 @property (nonatomic, strong) NSArray *tabTitles;
 @property (nonatomic, assign) NSInteger tabCount;
+@property (nonatomic, assign) NSInteger maxDistributedTabs;
 
 @property (nonatomic, strong) UICollectionView *collectionView;
 @property (nonatomic, weak) MSSTabBarCollectionViewCell *selectedCell;
@@ -41,6 +47,8 @@ CGFloat     const MSSTabBarViewTabOffsetInvalid = -1.0f;
 
 @property (nonatomic, strong) UIView *indicatorContainer;
 @property (nonatomic, strong) UIView *indicatorView;
+@property (nonatomic, strong) UIView *separatorView;
+@property (nonatomic, strong) UIView *verticalSeparatorView;
 @property (nonatomic, assign) CGFloat lineIndicatorHeight;
 @property (nonatomic, assign) CGFloat lineIndicatorInset;
 
@@ -52,13 +60,17 @@ CGFloat     const MSSTabBarViewTabOffsetInvalid = -1.0f;
 
 @property (nonatomic, assign) BOOL hasRespectedDefaultTabIndex;
 
+@property (nonatomic, assign) BOOL hasScrolledCollectionView;
+
 @property (nonatomic, assign) BOOL animateDataSourceTransition;
+
+@property (nonatomic, strong) MSSTabBarCollectionViewCell *sizingCell;
 
 @end
 
-static MSSTabBarCollectionViewCell *_sizingCell;
-
 @implementation MSSTabBarView
+
+@synthesize contentInset = _contentInset;
 
 #pragma mark - Init
 
@@ -98,7 +110,8 @@ static MSSTabBarCollectionViewCell *_sizingCell;
     CGFloat horizontalInset = MSSTabBarViewDefaultHorizontalContentInset;
     _contentInset = UIEdgeInsetsMake(0.0f, horizontalInset, 0.0f, horizontalInset);
     _tabOffset = MSSTabBarViewTabOffsetInvalid;
-
+    _maxDistributedTabs = MSSTabBarViewDefaultMaxDistributedTabs;
+    
     if (_height == 0.0f) {
         _height = MSSTabBarViewDefaultHeight;
     }
@@ -106,9 +119,12 @@ static MSSTabBarCollectionViewCell *_sizingCell;
     // Collection view
     UICollectionViewFlowLayout *layout = [UICollectionViewFlowLayout new];
     [layout setScrollDirection:UICollectionViewScrollDirectionHorizontal];
-    _collectionView = [[UICollectionView alloc]initWithFrame:CGRectZero collectionViewLayout:layout];
+    layout.sectionInsetReference = UICollectionViewFlowLayoutSectionInsetFromSafeArea;
+    _collectionView = [[UICollectionView alloc] initWithFrame:CGRectZero collectionViewLayout:layout];
     _collectionView.dataSource = self;
     _collectionView.delegate = self;
+    _collectionView.prefetchingEnabled = NO;
+    _collectionView.contentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentNever;
     self.scrollEnabled = MSSTabBarViewDefaultScrollEnabled;
     _tabTextColor = [UIColor blackColor];
     
@@ -118,31 +134,58 @@ static MSSTabBarCollectionViewCell *_sizingCell;
     _indicatorContainer.userInteractionEnabled = NO;
     _indicatorAttributes = @{MSSTabIndicatorLineHeight : @(MSSTabBarViewDefaultTabIndicatorHeight),
                              NSForegroundColorAttributeName : self.tintColor};
+    
+    _separatorView = [UIView new];
+    _separatorView.backgroundColor = [UIColor colorWithWhite:0.9f alpha:1.0f];
+    _verticalSeparatorView = [UIView new];
+    _verticalSeparatorView.backgroundColor = [UIColor colorWithWhite:0.9f alpha:1.0f];
 }
 
 #pragma mark - Lifecycle
 
 - (void)willMoveToSuperview:(UIView *)newSuperview {
     [super willMoveToSuperview:newSuperview];
-    
+    if (!self.separatorView.superview) {
+        UIView *subview = self.separatorView;
+        [self addSubview:self.separatorView];
+        subview.translatesAutoresizingMaskIntoConstraints = NO;
+        NSDictionary *views = NSDictionaryOfVariableBindings(subview);
+        
+        NSString *verticalConstraints = [NSString stringWithFormat:@"V:[subview(1)]|"];
+        NSString *horizontalConstraints = [NSString stringWithFormat:@"H:|[subview]|"];
+        [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:verticalConstraints
+                                                                     options:0
+                                                                     metrics:nil
+                                                                       views:views]];
+        [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:horizontalConstraints
+                                                                     options:0
+                                                                     metrics:nil
+                                                                       views:views]];
+    }
+    if (!self.verticalSeparatorView.superview) {
+        UIView *subview = self.verticalSeparatorView;
+        [self addSubview:self.verticalSeparatorView];
+        subview.translatesAutoresizingMaskIntoConstraints = NO;
+        NSDictionary *views = NSDictionaryOfVariableBindings(subview);
+        
+        NSString *verticalConstraints = [NSString stringWithFormat:@"H:[subview(1)]|"];
+        NSString *horizontalConstraints = [NSString stringWithFormat:@"V:|[subview]|"];
+        [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:verticalConstraints
+                                                                     options:0
+                                                                     metrics:nil
+                                                                       views:views]];
+        [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:horizontalConstraints
+                                                                     options:0
+                                                                     metrics:nil
+                                                                       views:views]];
+    }
     if (!self.collectionView.superview) {
-        
-        // create sizing cell if required
-        UINib *cellNib = [UINib nibWithNibName:NSStringFromClass([MSSTabBarCollectionViewCell class])
-                                        bundle:[NSBundle bundleForClass:[MSSTabBarCollectionViewCell class]]];
-        [self.collectionView registerNib:cellNib
-              forCellWithReuseIdentifier:MSSTabBarViewCellIdentifier];
-        if (!_sizingCell) {
-            _sizingCell = [[cellNib instantiateWithOwner:self options:nil]objectAtIndex:0];
-        }
-        
-        // collection view
+        [self registerCellForTabStyle:self.tabStyle];
         [self mss_addExpandingSubview:self.collectionView];
         self.collectionView.contentInset = self.contentInset;
         self.collectionView.backgroundColor = [UIColor clearColor];
         self.collectionView.showsHorizontalScrollIndicator = NO;
     }
-    
     if (!self.indicatorContainer.superview) {
         [self.collectionView addSubview:self.indicatorContainer];
         [self updateIndicatorForStyle:self.indicatorStyle];
@@ -151,8 +194,14 @@ static MSSTabBarCollectionViewCell *_sizingCell;
 
 - (void)layoutSubviews {
     [super layoutSubviews];
-
-    [self updateTabBarForTabIndex:self.tabOffset];
+    [self updateDistributedCellsCount];
+    if (self.tabOffset == MSSTabBarViewTabOffsetInvalid) {
+        [self updateTabBarForTabIndex:self.defaultTabIndex];
+        [self updateTabBarForTabOffset:self.defaultTabIndex];
+    } else {
+        [self updateTabBarForTabIndex:self.tabOffset];
+        [self updateTabBarForTabOffset:self.tabOffset];
+    }
     
     // if default tab has not yet been displayed
     if (self.tabCount > 0 && !self.selectedCell) {
@@ -176,7 +225,6 @@ static MSSTabBarCollectionViewCell *_sizingCell;
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView
                   cellForItemAtIndexPath:(NSIndexPath *)indexPath {
-    
     MSSTabBarCollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:MSSTabBarViewCellIdentifier
                                                                                   forIndexPath:indexPath];
     [self updateCellAppearance:cell];
@@ -193,9 +241,13 @@ static MSSTabBarCollectionViewCell *_sizingCell;
     cell.selectionProgress = self.tabDeselectedAlpha;
     
     if ((!self.hasRespectedDefaultTabIndex && indexPath.row == self.defaultTabIndex) ||
-        ([self.selectedIndexPath isEqual:indexPath] && self.tabOffset == MSSTabBarViewTabOffsetInvalid)) {
+        ([self.selectedIndexPath isEqual:indexPath] &&
+         self.tabOffset == MSSTabBarViewTabOffsetInvalid &&
+         !self.hasScrolledCollectionView)) {
         _hasRespectedDefaultTabIndex = YES;
         [self setTabCellActive:cell indexPath:indexPath];
+    } else if ([self.selectedIndexPath isEqual:indexPath]) {
+        [cell setSelectionProgress:1.0f animated:NO];
     }
     
     return cell;
@@ -206,42 +258,83 @@ static MSSTabBarCollectionViewCell *_sizingCell;
 - (CGSize)collectionView:(UICollectionView *)collectionView
                   layout:(UICollectionViewFlowLayout *)collectionViewLayout
   sizeForItemAtIndexPath:(NSIndexPath *)indexPath {
-    
+    CGSize fittingSize = UILayoutFittingCompressedSize;
     CGSize cellSize = CGSizeZero;
     
-    if (self.sizingStyle == MSSTabSizingStyleDistributed && self.tabCount <= MSSTabBarViewMaxDistributedTabs) { // distributed in frame
-        
-        CGFloat contentInsetTotal = self.contentInset.left + self.contentInset.right;
-        CGFloat totalSpacing = collectionViewLayout.minimumInteritemSpacing * (self.tabCount - 1);
-        CGFloat totalWidth = collectionView.bounds.size.width - contentInsetTotal - totalSpacing;
-        
-        return CGSizeMake(totalWidth / self.tabCount, collectionView.bounds.size.height);
-        
-    } else { // wrap tab contents
-        
-        // update sizing cell with population
+    if (self.axis == UILayoutConstraintAxisHorizontal) {
+        if (self.sizingStyle == MSSTabSizingStyleDistributed &&
+            self.tabCount <= self.maxDistributedTabs) { // distributed in frame
+            
+            CGFloat contentInsetTotal = self.contentInset.left + self.contentInset.right;
+            CGFloat totalSpacing = collectionViewLayout.minimumInteritemSpacing * (self.tabCount - 1);
+            CGFloat totalWidth = CGRectGetWidth(collectionView.bounds) - contentInsetTotal - totalSpacing;
+            
+            return CGSizeMake(totalWidth / self.tabCount, CGRectGetHeight(collectionView.bounds));
+        } else { // wrap tab contents
+            // update sizing cell with population
+            CGSize requiredSize = [self getSizeToFitCellSize:collectionView forIndex:indexPath.item];
+            
+            cellSize = requiredSize;
+        }
+    } else {
         if ([self.dataSource respondsToSelector:@selector(tabBarView:populateTab:atIndex:)]) {
-            [self.dataSource tabBarView:self populateTab:_sizingCell atIndex:indexPath.item];
-        } else  {
-            _sizingCell.title = [self titleAtIndex:indexPath.row];
+            [self.dataSource tabBarView:self populateTab:self.sizingCell atIndex:indexPath.item];
+        } else {
+            self.sizingCell.title = [self titleAtIndex:indexPath.row];
         }
         
-        CGSize requiredSize = [_sizingCell systemLayoutSizeFittingSize:CGSizeMake(0.0f, collectionView.bounds.size.height)
-                                        withHorizontalFittingPriority:UILayoutPriorityDefaultLow
-                                              verticalFittingPriority:UILayoutPriorityRequired];
-        requiredSize.width += self.tabPadding;
+        [self.sizingCell setNeedsLayout];
+        [self.sizingCell layoutIfNeeded];
+        
+        fittingSize.width = MSSTabBarViewDefaultCellWidthForVerticalAxis;
+        
+        CGSize requiredSize = [self.sizingCell systemLayoutSizeFittingSize:fittingSize
+                                             withHorizontalFittingPriority:UILayoutPriorityRequired
+                                                   verticalFittingPriority:UILayoutPriorityDefaultLow];
+        requiredSize.width = CGRectGetWidth(collectionView.bounds);
+        if (_tabHeight) {
+            requiredSize.height = _tabHeight;
+        } else {
+            requiredSize.height = [MSSTabBarCollectionViewCell heightForText:self.sizingCell.title
+                                                                  detailText:@""
+                                                                       width:fittingSize.width
+                                                                        font:[UIFont systemFontOfSize:14.0f]
+                                                                 imageOffset:44.0f];
+        }
         cellSize = requiredSize;
     }
     
     return cellSize;
 }
 
-- (void)collectionView:(UICollectionView *)collectionView
+- (BOOL)     collectionView:(UICollectionView *)collectionView
+shouldSelectItemAtIndexPath:(NSIndexPath *)indexPath {
+    return !_animatingTabChange;
+}
+
+- (void)  collectionView:(UICollectionView *)collectionView
 didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
-    
     if ([self.delegate respondsToSelector:@selector(tabBarView:tabSelectedAtIndex:)]) {
         [self.delegate tabBarView:self tabSelectedAtIndex:indexPath.row];
     }
+}
+
+#pragma mark - Scroll View Delegate
+
+- (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView {
+    _collectionView.allowsSelection = NO;
+    _hasScrolledCollectionView = YES;
+}
+
+- (void)scrollViewDidEndDragging:(UIScrollView *)scrollView
+                  willDecelerate:(BOOL)decelerate {
+    _collectionView.allowsSelection = YES;
+}
+
+- (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView {
+    [_collectionView selectItemAtIndexPath:self.selectedIndexPath
+                                  animated:NO
+                            scrollPosition:UICollectionViewScrollPositionNone];
 }
 
 #pragma mark - Public
@@ -257,7 +350,7 @@ didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
     // add selection indicator height to bottom of collection view inset
     CGFloat indicatorHeight;
     if (self.indicatorAttributes) {
-        indicatorHeight = [self.indicatorAttributes[MSSTabIndicatorLineHeight]floatValue];
+        indicatorHeight = [self.indicatorAttributes[MSSTabIndicatorLineHeight] floatValue];
     } else {
         indicatorHeight = self.selectionIndicatorHeight;
     }
@@ -266,13 +359,20 @@ didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
     self.collectionView.contentInset = contentInset;
 }
 
-- (void)setTabIndex:(NSInteger)index animated:(BOOL)animated {
+- (UIEdgeInsets)contentInset {
+    return self.axis == UILayoutConstraintAxisHorizontal ? _contentInset : UIEdgeInsetsZero;
+}
+
+- (void)setTabIndex:(NSInteger)index
+           animated:(BOOL)animated {
     if (animated) {
+        self.userInteractionEnabled = NO;
         _animatingTabChange = YES;
         [UIView animateWithDuration:0.25f animations:^{
             [self updateTabBarForTabIndex:index];
-        } completion:^(BOOL finished) {
+        }                completion:^(BOOL finished) {
             _animatingTabChange = NO;
+            self.userInteractionEnabled = YES;
         }];
     } else {
         [self updateTabBarForTabIndex:index];
@@ -286,6 +386,7 @@ didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
 }
 
 - (void)setDefaultTabIndex:(NSInteger)defaultTabIndex {
+    assert(defaultTabIndex != NSNotFound);
     if (self.tabOffset == MSSTabBarViewTabOffsetInvalid) { // only allow default to be set if tab is runtime default
         self.hasRespectedDefaultTabIndex = NO;
         _defaultTabIndex = defaultTabIndex;
@@ -309,8 +410,8 @@ didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
 }
 
 - (void)setTabTextFont:(UIFont *)tabTextFont {
-	_tabTextFont = tabTextFont;
-	[self reloadData];
+    _tabTextFont = tabTextFont;
+    [self reloadData];
 }
 
 - (void)setBackgroundView:(UIView *)backgroundView {
@@ -319,12 +420,12 @@ didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
     [self sendSubviewToBack:backgroundView];
 }
 
-- (void)setDataSource:(id<MSSTabBarViewDataSource>)dataSource {
+- (void)setDataSource:(id <MSSTabBarViewDataSource>)dataSource {
     self.animateDataSourceTransition = NO;
     [self doSetDataSource:dataSource];
 }
 
-- (void)setDataSource:(id<MSSTabBarViewDataSource>)dataSource animated:(BOOL)animated {
+- (void)setDataSource:(id <MSSTabBarViewDataSource>)dataSource animated:(BOOL)animated {
     self.animateDataSourceTransition = animated;
     [self doSetDataSource:dataSource];
 }
@@ -345,20 +446,50 @@ didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
     return self.scrollEnabled;
 }
 
+- (void)setAxis:(UILayoutConstraintAxis)axis {
+    if (_axis == axis) {
+        return;
+    }
+    _axis = axis;
+    self.indicatorContainer.hidden = _axis == UILayoutConstraintAxisVertical;
+    self.separatorView.hidden = _axis == UILayoutConstraintAxisVertical;
+    self.verticalSeparatorView.hidden = _axis == UILayoutConstraintAxisHorizontal;
+    self.collectionView.contentInset = self.contentInset;
+    UICollectionViewFlowLayout *layout = (UICollectionViewFlowLayout *) self.collectionView.collectionViewLayout;
+    layout.minimumLineSpacing = _axis == UILayoutConstraintAxisHorizontal ? 10.0f : 0.0f;
+    layout.scrollDirection = _axis ==
+                             UILayoutConstraintAxisHorizontal ? UICollectionViewScrollDirectionHorizontal : UICollectionViewScrollDirectionVertical;
+    [layout invalidateLayout];
+}
+
 - (void)setSizingStyle:(MSSTabSizingStyle)sizingStyle {
-    if ((sizingStyle == MSSTabSizingStyleDistributed && self.tabCount <= MSSTabBarViewMaxDistributedTabs) ||
+    if ((sizingStyle == MSSTabSizingStyleDistributed && self.tabCount <= MSSTabBarViewDefaultMaxDistributedTabs) ||
         sizingStyle == MSSTabSizingStyleSizeToFit) {
         _sizingStyle = sizingStyle;
         [self reloadData];
     } else {
-        NSLog(@"%@ - Distributed tab spacing is unavailable when using a tab count greater than %li", NSStringFromClass([self class]), (long)MSSTabBarViewMaxDistributedTabs);
+        NSLog(@"%@ - Distributed tab spacing is unavailable when using a tab count greater than %li", NSStringFromClass([self class]), (long) MSSTabBarViewDefaultMaxDistributedTabs);
     }
 }
 
 - (void)setTabStyle:(MSSTabStyle)tabStyle {
     _tabStyle = tabStyle;
-    _sizingCell.tabStyle = tabStyle;
+    [self registerCellForTabStyle:tabStyle];
     [self reloadData];
+}
+
+- (void)registerCellForTabStyle:(MSSTabStyle)tabStyle {
+    UINib *cellNib;
+    if (tabStyle == MSSTabStyleText) {
+        cellNib = [UINib nibWithNibName:MSSTabBarViewTextCellIdentifier
+                                 bundle:[NSBundle bundleForClass:[MSSTabBarCollectionViewCell class]]];
+        [self.collectionView registerNib:cellNib forCellWithReuseIdentifier:MSSTabBarViewCellIdentifier];
+    } else {
+        cellNib = [UINib nibWithNibName:MSSTabBarViewCellIdentifier
+                                 bundle:[NSBundle bundleForClass:[MSSTabBarCollectionViewCell class]]];
+        [self.collectionView registerNib:cellNib forCellWithReuseIdentifier:MSSTabBarViewCellIdentifier];
+    }
+    self.sizingCell = [[cellNib instantiateWithOwner:self options:nil] objectAtIndex:0];
 }
 
 - (void)setTintColor:(UIColor *)tintColor {
@@ -371,7 +502,7 @@ didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
     self.tabTransitionStyle = transitionStyle;
 }
 
-- (void)setTabAttributes:(NSDictionary<NSString *,id> *)tabAttributes {
+- (void)setTabAttributes:(NSDictionary<NSString *, id> *)tabAttributes {
     _tabAttributes = tabAttributes;
     [self reloadData];
 }
@@ -380,7 +511,7 @@ didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
     self.indicatorTransitionStyle = selectionIndicatorTransitionStyle;
 }
 
-- (void)setIndicatorAttributes:(NSDictionary<NSString *,id> *)indicatorAttributes {
+- (void)setIndicatorAttributes:(NSDictionary<NSString *, id> *)indicatorAttributes {
     _indicatorAttributes = indicatorAttributes;
     [self updateIndicatorAppearance];
 }
@@ -399,13 +530,34 @@ didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
     }
 }
 
+- (void)reloadData {
+    if (self.tabOffset == MSSTabBarViewTabOffsetInvalid) {
+        _hasRespectedDefaultTabIndex = NO;
+    }
+    [self.collectionView reloadData];
+    _hasScrolledCollectionView = NO;
+}
+
+- (void)deleteAndInsertTabsAtIndexPaths:(NSArray *)itemPaths {
+    [self.collectionView performBatchUpdates:^{
+        if (self.isExpanded) {
+            self.isExpanded = NO;
+            [self.collectionView deleteItemsAtIndexPaths:itemPaths];
+        } else {
+            self.isExpanded = YES;
+            [self.collectionView insertItemsAtIndexPaths:itemPaths];
+        }
+    }
+    completion:nil];
+}
+
 #pragma mark - Tab Bar State
 
 - (void)updateTabBarForTabOffset:(CGFloat)tabOffset {
     
     // calculate the percentage progress of the current tab transition
     float integral;
-    CGFloat progress = (CGFloat)modff(tabOffset, &integral);
+    CGFloat progress = (CGFloat) modff(tabOffset, &integral);
     BOOL isBackwards = !(tabOffset >= self.previousTabOffset);
     
     if (tabOffset <= 0.0f) { // stick at bottom of tab bar
@@ -414,16 +566,30 @@ didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
         [self updateTabsWithCurrentTabCell:firstTabCell nextTabCell:firstTabCell progress:1.0f backwards:NO];
         [self updateIndicatorViewWithCurrentTabCell:firstTabCell
                                         nextTabCell:firstTabCell
-                                           progress:1.0f];
+                                           progress:1.0f
+                                               axis:self.axis];
         
+        NSIndexPath *indexPath = [NSIndexPath indexPathForRow:0 inSection:0];
+        [self setTabCellsInactiveExceptTabIndex:indexPath.row];
+        [self setTabCellActive:firstTabCell indexPath:indexPath];
+        [_collectionView selectItemAtIndexPath:indexPath
+                                      animated:NO
+                                scrollPosition:UICollectionViewScrollPositionNone];
     } else if (tabOffset >= self.tabCount - 1) { // stick at top of tab bar
         
         MSSTabBarCollectionViewCell *lastTabCell = [self collectionViewCellAtTabIndex:self.tabCount - 1];
         [self updateTabsWithCurrentTabCell:lastTabCell nextTabCell:lastTabCell progress:1.0f backwards:NO];
         [self updateIndicatorViewWithCurrentTabCell:lastTabCell
                                         nextTabCell:lastTabCell
-                                           progress:1.0f];
+                                           progress:1.0f
+                                               axis:self.axis];
         
+        NSIndexPath *indexPath = [NSIndexPath indexPathForRow:self.tabCount - 1 inSection:0];
+        [self setTabCellsInactiveExceptTabIndex:indexPath.row];
+        [self setTabCellActive:lastTabCell indexPath:indexPath];
+        [_collectionView selectItemAtIndexPath:indexPath
+                                      animated:NO
+                                scrollPosition:UICollectionViewScrollPositionNone];
     } else { // update as required
         if (progress != 0.0f) {
             
@@ -442,7 +608,8 @@ didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
                                          backwards:isBackwards];
                 [self updateIndicatorViewWithCurrentTabCell:currentTabCell
                                                 nextTabCell:nextTabCell
-                                                   progress:progress];
+                                                   progress:progress
+                                                       axis:self.axis];
             }
         } else { // finished update - on a tab cell
             
@@ -451,7 +618,11 @@ didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
             NSIndexPath *indexPath = [self.collectionView indexPathForCell:selectedCell];
             
             if (selectedCell && indexPath) {
+                [self setTabCellsInactiveExceptTabIndex:indexPath.row];
                 [self setTabCellActive:selectedCell indexPath:indexPath];
+                [_collectionView selectItemAtIndexPath:indexPath
+                                              animated:NO
+                                        scrollPosition:UICollectionViewScrollPositionNone];
             }
         }
     }
@@ -486,17 +657,25 @@ didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
     _selectedIndexPath = indexPath;
     
     cell.selectionProgress = 1.0f;
-
-    if (self.animateDataSourceTransition) {
-        [UIView animateWithDuration:0.25f animations:^{
-            [self updateIndicatorViewFrameWithXOrigin:cell.frame.origin.x
-                                             andWidth:cell.frame.size.width
-                                    accountForPadding:YES];
-        }];
-    } else {
-        [self updateIndicatorViewFrameWithXOrigin:cell.frame.origin.x
-                                         andWidth:cell.frame.size.width
-                                accountForPadding:YES];
+    
+    if (self.indicatorStyle != MSSIndicatorDisabled) {
+        if (self.animateDataSourceTransition) {
+            [UIView animateWithDuration:0.25f animations:^{
+                [self updateIndicatorViewFrameWithXOrigin:cell.frame.origin.x
+                                                 andWidth:cell.frame.size.width
+                                        accountForPadding:YES
+                                                     axis:self.axis];
+            }];
+        } else {
+            CGFloat origin = self.axis ==
+                             UILayoutConstraintAxisVertical ? cell.frame.origin.y : cell.frame.origin.x;
+            CGFloat size = self.axis ==
+                           UILayoutConstraintAxisVertical ? cell.frame.size.height : cell.frame.size.width;
+            [self updateIndicatorViewFrameWithXOrigin:origin
+                                             andWidth:size
+                                    accountForPadding:YES
+                                                 axis:self.axis];
+        }
     }
 }
 
@@ -506,8 +685,8 @@ didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
 
 - (void)updateTabsWithCurrentTabCell:(MSSTabBarCollectionViewCell *)currentTabCell
                          nextTabCell:(MSSTabBarCollectionViewCell *)nextTabCell
-                             progress:(CGFloat)progress
-                            backwards:(BOOL)isBackwards {
+                            progress:(CGFloat)progress
+                           backwards:(BOOL)isBackwards {
     
     // Calculate updated alpha values for tabs
     progress = isBackwards ? 1.0f - progress : progress;
@@ -521,7 +700,6 @@ didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
         
         currentTabCell.selectionProgress = currentAlpha;
         nextTabCell.selectionProgress = nextAlpha;
-        
     } else { // snap
         
         CGFloat currentAlpha = (progress > MSSTabBarViewTabTransitionSnapRatio) ? self.tabDeselectedAlpha : 1.0f;
@@ -539,98 +717,165 @@ didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
 
 - (void)updateIndicatorViewWithCurrentTabCell:(MSSTabBarCollectionViewCell *)currentTabCell
                                   nextTabCell:(MSSTabBarCollectionViewCell *)nextTabCell
-                                     progress:(CGFloat)progress {
+                                     progress:(CGFloat)progress
+                                         axis:(UILayoutConstraintAxis)axis {
     if (self.tabCount == 0) {
         return;
     }
-    
-    // calculate the upper and lower x origins for cells
-    CGFloat upperXPos = MAX(nextTabCell.frame.origin.x, currentTabCell.frame.origin.x);
-    CGFloat lowerXPos = MIN(nextTabCell.frame.origin.x, currentTabCell.frame.origin.x);
-    
-    // swap cells according to which has lowest X origin
-    BOOL backwards = (nextTabCell.frame.origin.x == lowerXPos);
-    if (backwards) {
-        MSSTabBarCollectionViewCell *temp = nextTabCell;
-        nextTabCell = currentTabCell;
-        currentTabCell = temp;
-    }
-    
-    CGFloat newX = 0.0f;
-    CGFloat newWidth = 0.0f;
-    
-    if (self.indicatorTransitionStyle == MSSTabTransitionStyleProgressive) {
+    if (axis == UILayoutConstraintAxisVertical) {
+        // calculate the upper and lower x origins for cells
+        CGFloat upperXPos = MAX(nextTabCell.frame.origin.y, currentTabCell.frame.origin.y);
+        CGFloat lowerXPos = MIN(nextTabCell.frame.origin.y, currentTabCell.frame.origin.y);
         
-        // calculate width difference
-        CGFloat currentTabWidth = currentTabCell.frame.size.width;
-        CGFloat nextTabWidth = nextTabCell.frame.size.width;
-        CGFloat widthDiff = (nextTabWidth - currentTabWidth) * progress;
+        // swap cells according to which has lowest X origin
+        BOOL backwards = (nextTabCell.frame.origin.y == lowerXPos);
+        if (backwards) {
+            MSSTabBarCollectionViewCell *temp = nextTabCell;
+            nextTabCell = currentTabCell;
+            currentTabCell = temp;
+        }
         
-        // calculate new frame for indicator
-        newX = lowerXPos + ((upperXPos - lowerXPos) * progress);
-        newWidth = currentTabWidth + widthDiff;
+        CGFloat newX = 0.0f;
+        CGFloat newWidth = 0.0f;
         
-        [self updateIndicatorViewFrameWithXOrigin:newX
-                                         andWidth:newWidth
-                                accountForPadding:YES];
+        if (self.indicatorTransitionStyle == MSSTabTransitionStyleProgressive) {
+            
+            // calculate width difference
+            CGFloat currentTabWidth = currentTabCell.frame.size.height;
+            CGFloat nextTabWidth = nextTabCell.frame.size.height;
+            CGFloat widthDiff = (nextTabWidth - currentTabWidth) * progress;
+            
+            // calculate new frame for indicator
+            newX = lowerXPos + ((upperXPos - lowerXPos) * progress);
+            newWidth = currentTabWidth + widthDiff;
+            
+            [self updateIndicatorViewFrameWithXOrigin:newX
+                                             andWidth:newWidth
+                                    accountForPadding:YES
+                                                 axis:self.axis];
+        } else if (self.indicatorTransitionStyle == MSSTabTransitionStyleSnap) {
+            
+            MSSTabBarCollectionViewCell *cell = progress > MSSTabBarViewTabTransitionSnapRatio ? nextTabCell : currentTabCell;
+            
+            newX = cell.frame.origin.y;
+            newWidth = cell.frame.size.height;
+            
+            BOOL requiresUpdate = self.indicatorContainer.frame.origin.y != newX;
+            if (requiresUpdate) {
+                [UIView animateWithDuration:0.25f animations:^{
+                    [self updateIndicatorViewFrameWithXOrigin:newX
+                                                     andWidth:newWidth
+                                            accountForPadding:YES
+                                                         axis:self.axis];
+                }];
+            }
+        }
+    } else {
+        // calculate the upper and lower x origins for cells
+        CGFloat upperXPos = MAX(nextTabCell.frame.origin.x, currentTabCell.frame.origin.x);
+        CGFloat lowerXPos = MIN(nextTabCell.frame.origin.x, currentTabCell.frame.origin.x);
         
-    } else if (self.indicatorTransitionStyle == MSSTabTransitionStyleSnap) {
+        // swap cells according to which has lowest X origin
+        BOOL backwards = (nextTabCell.frame.origin.x == lowerXPos);
+        if (backwards) {
+            MSSTabBarCollectionViewCell *temp = nextTabCell;
+            nextTabCell = currentTabCell;
+            currentTabCell = temp;
+        }
         
-        MSSTabBarCollectionViewCell *cell = progress > MSSTabBarViewTabTransitionSnapRatio ? nextTabCell : currentTabCell;
+        CGFloat newX = 0.0f;
+        CGFloat newWidth = 0.0f;
         
-        newX = cell.frame.origin.x;
-        newWidth = cell.frame.size.width;
-        
-        BOOL requiresUpdate = self.indicatorContainer.frame.origin.x != newX;
-        if (requiresUpdate) {
-            [UIView animateWithDuration:0.25f animations:^{
-                [self updateIndicatorViewFrameWithXOrigin:newX
-                                                 andWidth:newWidth
-                                        accountForPadding:YES];
-            }];
+        if (self.indicatorTransitionStyle == MSSTabTransitionStyleProgressive) {
+            
+            // calculate width difference
+            CGFloat currentTabWidth = currentTabCell.frame.size.width;
+            CGFloat nextTabWidth = nextTabCell.frame.size.width;
+            CGFloat widthDiff = (nextTabWidth - currentTabWidth) * progress;
+            
+            // calculate new frame for indicator
+            newX = lowerXPos + ((upperXPos - lowerXPos) * progress);
+            newWidth = currentTabWidth + widthDiff;
+            
+            [self updateIndicatorViewFrameWithXOrigin:newX
+                                             andWidth:newWidth
+                                    accountForPadding:YES
+                                                 axis:self.axis];
+        } else if (self.indicatorTransitionStyle == MSSTabTransitionStyleSnap) {
+            
+            MSSTabBarCollectionViewCell *cell = progress > MSSTabBarViewTabTransitionSnapRatio ? nextTabCell : currentTabCell;
+            
+            newX = cell.frame.origin.x;
+            newWidth = cell.frame.size.width;
+            
+            BOOL requiresUpdate = self.indicatorContainer.frame.origin.x != newX;
+            if (requiresUpdate) {
+                [UIView animateWithDuration:0.25f animations:^{
+                    [self updateIndicatorViewFrameWithXOrigin:newX
+                                                     andWidth:newWidth
+                                            accountForPadding:YES
+                                                         axis:self.axis];
+                }];
+            }
         }
     }
 }
 
 - (void)updateIndicatorViewFrameWithXOrigin:(CGFloat)xOrigin
-                                            andWidth:(CGFloat)width
-                                   accountForPadding:(BOOL)padding {
+                                   andWidth:(CGFloat)width
+                          accountForPadding:(BOOL)padding
+                                       axis:(UILayoutConstraintAxis)axis {
     if (self.tabCount == 0) {
         return;
     }
-    
     if (padding) {
         CGFloat tabInternalPadding = self.tabPadding;
         width -= tabInternalPadding;
         xOrigin += (tabInternalPadding / 2.0f);
     }
     
-    self.indicatorContainer.frame = CGRectMake(xOrigin,
-                                               0.0f,
-                                               width,
-                                               self.bounds.size.height);
+    if (axis == UILayoutConstraintAxisVertical) {
+        self.indicatorContainer.frame = CGRectMake(0.0f, xOrigin, CGRectGetWidth(self.bounds), width);
+    } else {
+        self.indicatorContainer.frame = CGRectMake(xOrigin, 0.0f, width, CGRectGetHeight(self.bounds));
+    }
+    
     [self updateIndicatorFrames];
     [self updateCollectionViewScrollOffset];
 }
 
 - (void)updateCollectionViewScrollOffset {
-    if (self.sizingStyle != MSSTabSizingStyleDistributed) {
-        
-        // scroll collection view to center selection indicator if possible
-        CGFloat collectionViewWidth = self.collectionView.bounds.size.width - self.contentInset.left - self.contentInset.right;
-        CGFloat scrollViewX = MAX(0, self.indicatorContainer.center.x - (collectionViewWidth / 2.0f));
-        [self.collectionView scrollRectToVisible:CGRectMake(scrollViewX,
-                                                            self.collectionView.frame.origin.y,
-                                                            collectionViewWidth,
-                                                            self.collectionView.frame.size.height)
-                                        animated:NO];
+    if (self.sizingStyle != MSSTabSizingStyleDistributed ||
+        self.tabCount > MSSTabBarViewDefaultMaxDistributedTabs) {
+        if (self.axis == UILayoutConstraintAxisVertical) {
+            // scroll collection view to center selection indicator if possible
+            CGFloat collectionViewHeight = self.collectionView.bounds.size.height -
+                                           self.contentInset.top -
+                                           self.contentInset.bottom;
+            CGFloat scrollViewY = MAX(0, self.indicatorContainer.center.y - (collectionViewHeight / 2.0f));
+            [self.collectionView scrollRectToVisible:CGRectMake(self.collectionView.frame.origin.x, scrollViewY, self.collectionView.frame.size.width, collectionViewHeight)
+                                            animated:NO];
+        } else {
+            // scroll collection view to center selection indicator if possible
+            CGFloat collectionViewWidth = self.collectionView.bounds.size.width -
+                                          self.contentInset.left -
+                                          self.contentInset.right;
+            CGFloat scrollViewX = MAX(0, self.indicatorContainer.center.x - (collectionViewWidth / 2.0f));
+            [self.collectionView scrollRectToVisible:CGRectMake(scrollViewX,
+                                                                self.collectionView.frame.origin.y,
+                                                                collectionViewWidth,
+                                                                self.collectionView.frame.size.height)
+                                            animated:NO];
+        }
     }
 }
 
 - (MSSTabBarCollectionViewCell *)collectionViewCellAtTabIndex:(NSInteger)tabIndex {
     if (tabIndex >= 0 && tabIndex < self.tabCount) {
         NSIndexPath *indexPath = [NSIndexPath indexPathForItem:tabIndex inSection:0];
-        return (MSSTabBarCollectionViewCell *)[self.collectionView cellForItemAtIndexPath:indexPath];
+        [self.collectionView layoutIfNeeded];
+        return [self.collectionView cellForItemAtIndexPath:indexPath] ?: [self collectionView:self.collectionView
+                                                                       cellForItemAtIndexPath:indexPath];
     }
     return nil;
 }
@@ -638,7 +883,7 @@ didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
 #pragma mark - Internal
 
 - (NSArray *)evaluateTabTitles {
-    NSArray *tabTitles = [[self.dataSource tabTitlesForTabBarView:self]copy];
+    NSArray *tabTitles = [[self.dataSource tabTitlesForTabBarView:self] copy];
     return tabTitles;
 }
 
@@ -646,7 +891,6 @@ didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
     NSInteger tabCount = 0;
     if ([self.dataSource respondsToSelector:@selector(numberOfItemsForTabBarView:)]) {
         tabCount = [self.dataSource numberOfItemsForTabBarView:self];
-        
     } else if ([self.dataSource respondsToSelector:@selector(tabTitlesForTabBarView:)]) {
         
         self.tabTitles = [self evaluateTabTitles];
@@ -660,7 +904,7 @@ didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
     if (self.tabTitles) {
         return self.tabTitles[index];
     } else {
-        return [NSString stringWithFormat:MSSTabBarViewDefaultTabTitleFormat, (long)(index + 1)];
+        return [NSString stringWithFormat:MSSTabBarViewDefaultTabTitleFormat, (long) (index + 1)];
     }
 }
 
@@ -672,7 +916,7 @@ didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
     _previousTabOffset = MSSTabBarViewTabOffsetInvalid;
 }
 
-- (void)doSetDataSource:(id<MSSTabBarViewDataSource>)dataSource {
+- (void)doSetDataSource:(id <MSSTabBarViewDataSource>)dataSource {
     _dataSource = dataSource;
     [self reset];
     if ([dataSource respondsToSelector:@selector(defaultTabIndexForTabBarView:)]) {
@@ -682,11 +926,43 @@ didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
     [self setNeedsLayout];
 }
 
-- (void)reloadData {
-    if (self.tabOffset == MSSTabBarViewTabOffsetInvalid) {
-        _hasRespectedDefaultTabIndex = NO;
+- (void)updateDistributedCellsCount {
+    if (self.axis == UILayoutConstraintAxisHorizontal) {
+        CGFloat containerWidth = CGRectGetWidth(self.bounds);
+        CGFloat cellsWidth = self.collectionView.contentInset.left;
+        NSUInteger index = 0;
+        while (index < [self collectionView:self.collectionView numberOfItemsInSection:0]) {
+            cellsWidth += [self getSizeToFitCellSize:self.collectionView forIndex:index].width;
+            UICollectionViewFlowLayout *layout = (UICollectionViewFlowLayout *) self.collectionView.collectionViewLayout;
+            cellsWidth += layout.minimumInteritemSpacing;
+            if (containerWidth <= cellsWidth) {
+                break;
+            }
+            index++;
+        }
+        self.maxDistributedTabs = index;
     }
-    [self.collectionView reloadData];
+}
+
+- (CGSize)getSizeToFitCellSize:(UICollectionView *)collectionView
+                      forIndex:(NSUInteger)index {
+    if ([self.dataSource respondsToSelector:@selector(tabBarView:populateTab:atIndex:)]) {
+        [self.dataSource tabBarView:self populateTab:self.sizingCell atIndex:index];
+    } else {
+        self.sizingCell.title = [self titleAtIndex:index];
+    }
+    
+    [self.sizingCell setNeedsLayout];
+    [self.sizingCell layoutIfNeeded];
+    
+    CGSize fittingSize = UILayoutFittingCompressedSize;
+    fittingSize.height = CGRectGetHeight(collectionView.bounds);
+    
+    CGSize requiredSize = [self.sizingCell systemLayoutSizeFittingSize:fittingSize
+                                         withHorizontalFittingPriority:UILayoutPriorityFittingSizeLevel
+                                               verticalFittingPriority:UILayoutPriorityRequired];
+    requiredSize.width += self.tabPadding;
+    return requiredSize;
 }
 
 - (void)updateCellAppearance:(MSSTabBarCollectionViewCell *)cell {
@@ -720,10 +996,9 @@ didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
         if ((deselectedAlphaValue = self.tabAttributes[MSSTabTitleAlpha])) {
             self.tabDeselectedAlpha = [deselectedAlphaValue floatValue];
         }
-        
     } else {
         cell.textColor = self.tabTextColor;
-        if(self.tabTextFont){
+        if (self.tabTextFont) {
             cell.textFont = self.tabTextFont;
         }
     }
@@ -751,7 +1026,7 @@ didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
     }
     
     cell.backgroundColor = [UIColor clearColor];
-    [cell setContentBottomMargin:[self.indicatorAttributes[MSSTabIndicatorLineHeight]floatValue]];
+    [cell setContentBottomMargin:[self.indicatorAttributes[MSSTabIndicatorLineHeight] floatValue]];
 }
 
 - (void)updateIndicatorForStyle:(MSSIndicatorStyle)indicatorStyle {
@@ -759,6 +1034,8 @@ didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
     
     UIView *indicatorView;
     switch (indicatorStyle) {
+        case MSSIndicatorDisabled:
+            break;
         case MSSIndicatorStyleLine: {
             UIView *indicatorLineView = [UIView new];
             [self.indicatorContainer addSubview:indicatorLineView];
@@ -774,9 +1051,6 @@ didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
             
             indicatorView = imageView;
         }
-            break;
-            
-        default:
             break;
     }
     
@@ -803,16 +1077,16 @@ didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
                 break;
                 
             case MSSIndicatorStyleImage: {
-                UIImageView *indicatorImageView = (UIImageView *)self.indicatorView;
-                
-                UIImage *indicatorImage;
-                if ((indicatorImage = self.indicatorAttributes[MSSTabIndicatorImage])) {
-                    indicatorImageView.image = [indicatorImage imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
-                }
+                UIImageView *indicatorImageView = (UIImageView *) self.indicatorView;
                 
                 UIColor *indicatorTintColor;
                 if ((indicatorTintColor = self.indicatorAttributes[MSSTabIndicatorImageTintColor])) {
                     indicatorImageView.tintColor = indicatorTintColor;
+                }
+                
+                UIImage *indicatorImage;
+                if ((indicatorImage = self.indicatorAttributes[MSSTabIndicatorImage])) {
+                    indicatorImageView.image = [indicatorImage imageWithRenderingMode:indicatorTintColor ? UIImageRenderingModeAlwaysTemplate : UIImageRenderingModeAlwaysOriginal];
                 }
             }
                 break;
@@ -825,10 +1099,14 @@ didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
     
     CGFloat height = 0.0f;
     switch (self.indicatorStyle) {
+        case MSSIndicatorDisabled:
+            height = 0.0f;
+            break;
+        
         case MSSIndicatorStyleLine:
             height = self.lineIndicatorHeight;
             break;
-            
+        
         case MSSIndicatorStyleImage:
             height = self.indicatorContainer.bounds.size.height;
             break;

@@ -64,7 +64,7 @@ CGFloat const kMSSTabNavigationBarBottomPadding = 4.0f;
 }
 
 - (UIView *)hitTest:(CGPoint)point withEvent:(UIEvent *)event {
-
+    
     if (CGRectContainsPoint(self.tabBarView.frame, point) && self.tabBarView.userInteractionEnabled && self.tabBarRequired) {
         CGPoint tabBarPoint = [self.tabBarView convertPoint:point fromView:self];
         return [self.tabBarView hitTest:tabBarPoint withEvent:event];
@@ -81,7 +81,7 @@ CGFloat const kMSSTabNavigationBarBottomPadding = 4.0f;
     self.tabBarView.tintColor = tintColor;
 }
 
-- (void)setTitleTextAttributes:(NSDictionary<NSString *,id> *)titleTextAttributes {
+- (void)setTitleTextAttributes:(NSDictionary<NSString *, id> *)titleTextAttributes {
     [super setTitleTextAttributes:titleTextAttributes];
     
     UIColor *foregroundColor = nil;
@@ -119,16 +119,19 @@ CGFloat const kMSSTabNavigationBarBottomPadding = 4.0f;
 
 #pragma mark - Private
 
-- (void)tabbedPageViewController:(MSSTabbedPageViewController *)tabbedPageViewController viewWillAppear:(BOOL)animated isInitial:(BOOL)isInitial {
+- (void)tabbedPageViewController:(MSSTabbedPageViewController *)tabbedPageViewController
+                  viewWillAppear:(BOOL)animated
+                       isInitial:(BOOL)isInitial {
     _activeTabbedPageViewController = tabbedPageViewController;
     
     [self setOffsetTransformRequired:isInitial];
     [self setTabBarRequired:YES animated:animated];
 }
 
-- (void)tabbedPageViewController:(MSSTabbedPageViewController *)tabbedPageViewController viewWillDisappear:(BOOL)animated {
+- (void)tabbedPageViewController:(MSSTabbedPageViewController *)tabbedPageViewController
+               viewWillDisappear:(BOOL)animated {
     if (tabbedPageViewController == self.activeTabbedPageViewController) {
-         [self setTabBarRequired:NO animated:animated];
+        [self setTabBarRequired:NO animated:animated];
     }
 }
 
@@ -140,7 +143,8 @@ CGFloat const kMSSTabNavigationBarBottomPadding = 4.0f;
 
 #pragma mark - Internal
 
-- (void)setTabBarRequired:(BOOL)required animated:(BOOL)animated {
+- (void)setTabBarRequired:(BOOL)required
+                 animated:(BOOL)animated {
     if (self.tabBarRequired != required) {
         
         // show or hide tab bar view

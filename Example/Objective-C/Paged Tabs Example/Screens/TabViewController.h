@@ -6,7 +6,8 @@
 //  Copyright © 2015 Merrick Sapsford. All rights reserved.
 //
 
-#import "MSSTabbedPageViewController.h"
+#import <MSSTabbedPageViewController/MSSTabbedPageViewController.h>
+#import <UIKit/UIKit.h>
 #import "TabControllerStyle.h"
 
 @interface TabViewController : MSSTabbedPageViewController

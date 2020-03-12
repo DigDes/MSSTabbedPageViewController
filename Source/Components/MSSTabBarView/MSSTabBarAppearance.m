@@ -8,12 +8,12 @@
 
 #import "MSSTabBarAppearance.h"
 
-NSString *  const MSSTabTextColor = @"tabTextColor";
-NSString *  const MSSTabTextFont = @"tabTextFont";
-NSString *  const MSSTabTitleAlpha = @"tabTitleAlpha";
+NSString *const MSSTabTextColor = @"tabTextColor";
+NSString *const MSSTabTextFont = @"tabTextFont";
+NSString *const MSSTabTitleAlpha = @"tabTitleAlpha";
 
-NSString *  const MSSTabIndicatorLineHeight = @"indicatorLineHeight";
-NSString *  const MSSTabIndicatorImage = @"indicatorImage";
-NSString *  const MSSTabIndicatorImageTintColor = @"indicatorImageTintColor";
+NSString *const MSSTabIndicatorLineHeight = @"indicatorLineHeight";
+NSString *const MSSTabIndicatorImage = @"indicatorImage";
+NSString *const MSSTabIndicatorImageTintColor = @"indicatorImageTintColor";
 
-NSString *  const MSSTabTransitionAlphaEffectEnabled = @"alphaEffectEnabled";
+NSString *const MSSTabTransitionAlphaEffectEnabled = @"alphaEffectEnabled";

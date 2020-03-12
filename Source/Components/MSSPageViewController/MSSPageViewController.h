@@ -147,12 +147,6 @@ willDisplayInitialViewController:(nonnull UIViewController *)viewController;
  The view controllers within the page view controller.
  */
 @property (nonatomic, strong, readonly, nullable) NSArray<UIViewController *> *viewControllers;
-
-/** 
- Whether page view controller will display the page indicator view.
- */
-@property (nonatomic, assign) BOOL showPageIndicator;
-
 /**
  Whether page view controller will provide delegate updates on scroll events.
  */
@@ -165,6 +159,10 @@ willDisplayInitialViewController:(nonnull UIViewController *)viewController;
  Whether scroll view interaction is enabled on the page view controller.
  */
 @property (nonatomic, assign, getter=isScrollEnabled) BOOL scrollEnabled;
+/**
+ Whether animation of moving to new page enabled.
+ */
+@property (nonatomic, assign, getter=isScrollAnimationEnabled) BOOL scrollAnimationEnabled;
 /**
  Whether user interaction is allowed on the page view controller.
  */
