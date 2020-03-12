@@ -59,36 +59,36 @@
 }
 
 - (void)prepareForReuse {
-	[super prepareForReuse];
-	self.verticalImageTextImageView.image = nil;
-	self.verticalImageTextImageView.highlightedImage = nil;
+    [super prepareForReuse];
+    self.verticalImageTextImageView.image = nil;
+    self.verticalImageTextImageView.highlightedImage = nil;
 }
 
 #pragma mark - Public
 
 - (void)setTitle:(NSString *)title {
-	self.textTitleLabel.text = title;
-	self.imageTextTitleLabel.text = title;
-	self.verticalImageTextTitleLabel.text = title;
+    self.textTitleLabel.text = title;
+    self.imageTextTitleLabel.text = title;
+    self.verticalImageTextTitleLabel.text = title;
 }
 
 - (NSString *)title {
     return self.textTitleLabel.text;
 }
 
--(void)setDetailText:(NSString *)detailText {
-	self.verticalImageTextDetailTitleLabel.text = detailText;
+- (void)setDetailText:(NSString *)detailText {
+    self.verticalImageTextDetailTitleLabel.text = detailText;
 }
 
 - (NSString *)detailText {
-	return self.verticalImageTextDetailTitleLabel.text;
+    return self.verticalImageTextDetailTitleLabel.text;
 }
 
 - (void)setImage:(UIImage *)image {
     if (self.tabStyle == MSSTabStyleImage || self.tabStyle == MSSTabStyleImageAndText) {
         self.imageImageView.image = image;
         self.imageTextImageView.image = image;
-		self.verticalImageTextImageView.image = image;
+        self.verticalImageTextImageView.image = image;
     }
 }
 
@@ -97,64 +97,63 @@
 }
 
 - (UIImage *)highlightedImage {
-	return self.imageImageView.highlightedImage;
+    return self.imageImageView.highlightedImage;
 }
 
 - (void)setHighlightedImage:(UIImage *)highlightedImage {
-	if (self.tabStyle == MSSTabStyleImage || self.tabStyle == MSSTabStyleImageAndText) {
-		self.imageImageView.highlightedImage = highlightedImage;
-		self.imageTextImageView.highlightedImage = highlightedImage;
-	}
+    if (self.tabStyle == MSSTabStyleImage || self.tabStyle == MSSTabStyleImageAndText) {
+        self.imageImageView.highlightedImage = highlightedImage;
+        self.imageTextImageView.highlightedImage = highlightedImage;
+    }
 }
 
 - (CGFloat)tabAlpha {
-	return self.textTitleLabel.alpha;
+    return self.textTitleLabel.alpha;
 }
 
 - (void)setTabAlpha:(CGFloat)tabAlpha {
-	self.textTitleLabel.alpha = tabAlpha;
-	self.imageTextTitleLabel.alpha = tabAlpha;
-	self.verticalImageTextTitleLabel.alpha = tabAlpha;
-	self.imageImageView.alpha = tabAlpha;
-	self.imageTextImageView.alpha = tabAlpha;
-	self.verticalImageTextImageView.alpha = tabAlpha;
+    self.textTitleLabel.alpha = tabAlpha;
+    self.imageTextTitleLabel.alpha = tabAlpha;
+    self.verticalImageTextTitleLabel.alpha = tabAlpha;
+    self.imageImageView.alpha = tabAlpha;
+    self.imageTextImageView.alpha = tabAlpha;
+    self.verticalImageTextImageView.alpha = tabAlpha;
 }
 
 static CGFloat const kTableViewCellMinHeight = 44.0f;
 static CGFloat const kTableViewCellMaxHeight = 70.0f;
 
-+ (CGFloat)heightForText:(NSString *)aText detailText:(NSString *)detailText width:(CGFloat)width font:(UIFont *)font imageOffset:(CGFloat)imageOffset{
-	NSMutableParagraphStyle *paragraphStyle = [[NSMutableParagraphStyle alloc] init];
-	paragraphStyle.lineBreakMode = NSLineBreakByWordWrapping;
-	
-	NSDictionary *attributes = @{NSFontAttributeName: font, NSParagraphStyleAttributeName: paragraphStyle};
-	
-	CGRect rect = [aText boundingRectWithSize:CGSizeMake(width - imageOffset, MAXFLOAT)
-						 options:NSStringDrawingUsesLineFragmentOrigin
-						 attributes:attributes
-						 context:nil];
-	if (detailText.length > 0) {
-		if (CGRectGetHeight(rect) < 22.0f) {
-			return kTableViewCellMinHeight;
-		}
-		else if (CGRectGetHeight(rect) >= 22.0f && CGRectGetHeight(rect) < 48.0f) {
-			return CGRectGetHeight(rect) + 22.0f;
-		}
-		else {
-			return kTableViewCellMaxHeight;
-		}
-	}
-	else {
-		if (CGRectGetHeight(rect) < 35.0f) {
-			return kTableViewCellMinHeight;
-		}
-		else if (CGRectGetHeight(rect) >= 35.0f && CGRectGetHeight(rect) < 57.0f) {
-			return CGRectGetHeight(rect) + 13.0f;
-		}
-		else {
-			return kTableViewCellMaxHeight;
-		}
-	}
++ (CGFloat)heightForText:(NSString *)aText
+              detailText:(NSString *)detailText
+                   width:(CGFloat)width
+                    font:(UIFont *)font
+             imageOffset:(CGFloat)imageOffset {
+    NSMutableParagraphStyle *paragraphStyle = [[NSMutableParagraphStyle alloc] init];
+    paragraphStyle.lineBreakMode = NSLineBreakByWordWrapping;
+    
+    NSDictionary *attributes = @{NSFontAttributeName: font, NSParagraphStyleAttributeName: paragraphStyle};
+    
+    CGRect rect = [aText boundingRectWithSize:CGSizeMake(width - imageOffset, MAXFLOAT)
+                                      options:NSStringDrawingUsesLineFragmentOrigin
+                                   attributes:attributes
+                                      context:nil];
+    if (detailText.length > 0) {
+        if (CGRectGetHeight(rect) < 22.0f) {
+            return kTableViewCellMinHeight;
+        } else if (CGRectGetHeight(rect) >= 22.0f && CGRectGetHeight(rect) < 48.0f) {
+            return CGRectGetHeight(rect) + 22.0f;
+        } else {
+            return kTableViewCellMaxHeight;
+        }
+    } else {
+        if (CGRectGetHeight(rect) < 35.0f) {
+            return kTableViewCellMinHeight;
+        } else if (CGRectGetHeight(rect) >= 35.0f && CGRectGetHeight(rect) < 57.0f) {
+            return CGRectGetHeight(rect) + 13.0f;
+        } else {
+            return kTableViewCellMaxHeight;
+        }
+    }
 }
 
 #pragma mark - Private
@@ -164,7 +163,7 @@ static CGFloat const kTableViewCellMaxHeight = 70.0f;
     if (!_isSelected) {
         self.textTitleLabel.textColor = textColor;
         self.imageTextTitleLabel.textColor = textColor;
-		self.verticalImageTextTitleLabel.textColor = textColor;
+        self.verticalImageTextTitleLabel.textColor = textColor;
     }
 }
 
@@ -173,10 +172,10 @@ static CGFloat const kTableViewCellMaxHeight = 70.0f;
     if (_isSelected) {
         self.textTitleLabel.textColor = selectedTextColor;
         self.imageTextTitleLabel.textColor = selectedTextColor;
-		self.verticalImageTextTitleLabel.textColor = selectedTextColor;
-		self.imageImageView.tintColor = selectedTextColor;
-		self.imageTextImageView.tintColor = selectedTextColor;
-		self.verticalImageTextImageView.tintColor = selectedTextColor;
+        self.verticalImageTextTitleLabel.textColor = selectedTextColor;
+        self.imageImageView.tintColor = selectedTextColor;
+        self.imageTextImageView.tintColor = selectedTextColor;
+        self.verticalImageTextImageView.tintColor = selectedTextColor;
     }
 }
 
@@ -185,7 +184,7 @@ static CGFloat const kTableViewCellMaxHeight = 70.0f;
     if (!_isSelected) {
         self.textTitleLabel.font = textFont;
         self.imageTextTitleLabel.font = textFont;
-		self.verticalImageTextTitleLabel.font = textFont;
+        self.verticalImageTextTitleLabel.font = textFont;
     }
 }
 
@@ -194,7 +193,7 @@ static CGFloat const kTableViewCellMaxHeight = 70.0f;
     if (_isSelected) {
         self.textTitleLabel.font = selectedTextFont;
         self.imageTextTitleLabel.font = selectedTextFont;
-		self.verticalImageTextTitleLabel.font = selectedTextFont;
+        self.verticalImageTextTitleLabel.font = selectedTextFont;
     }
 }
 
@@ -204,16 +203,16 @@ static CGFloat const kTableViewCellMaxHeight = 70.0f;
     switch (tabStyle) {
         case MSSTabStyleImageAndText:
             [self.textContainerView removeFromSuperview];
-			[self.imageContainerView removeFromSuperview];
+            [self.imageContainerView removeFromSuperview];
             self.imageTextContainerView.hidden = NO;
             break;
-            
+        
         case MSSTabStyleImage:
-			[self.textContainerView removeFromSuperview];
+            [self.textContainerView removeFromSuperview];
             self.imageContainerView.hidden = NO;
             [self.imageTextContainerView removeFromSuperview];
             break;
-            
+        
         default:
             self.textContainerView.hidden = NO;
             [self.imageContainerView removeFromSuperview];
@@ -250,14 +249,15 @@ static CGFloat const kTableViewCellMaxHeight = 70.0f;
 }
 
 - (void)setSelectionProgress:(CGFloat)selectionProgress {
-	[self setSelectionProgress:selectionProgress animated:YES];
+    [self setSelectionProgress:selectionProgress animated:YES];
 }
 
-- (void)setSelectionProgress:(CGFloat)selectionProgress animated:(BOOL)animated {
-	_selectionProgress = selectionProgress;
-	
-	[self updateProgressiveAppearance];
-	[self updateSelectionAppearanceAnimated:animated];
+- (void)setSelectionProgress:(CGFloat)selectionProgress
+                    animated:(BOOL)animated {
+    _selectionProgress = selectionProgress;
+    
+    [self updateProgressiveAppearance];
+    [self updateSelectionAppearanceAnimated:animated];
 }
 
 - (void)setAlphaEffectEnabled:(BOOL)alphaEffectEnabled {
@@ -267,7 +267,7 @@ static CGFloat const kTableViewCellMaxHeight = 70.0f;
     } else {
         self.textTitleLabel.alpha = 1.0f;
         self.imageTextTitleLabel.alpha = 1.0f;
-		self.verticalImageTextImageView.alpha = 1.0f;
+        self.verticalImageTextImageView.alpha = 1.0f;
     }
 }
 
@@ -280,7 +280,7 @@ static CGFloat const kTableViewCellMaxHeight = 70.0f;
             if (self.alphaEffectEnabled) {
                 self.textTitleLabel.alpha = self.selectionProgress;
                 self.imageTextTitleLabel.alpha = self.selectionProgress;
-				self.verticalImageTextTitleLabel.alpha = self.selectionProgress;
+                self.verticalImageTextTitleLabel.alpha = self.selectionProgress;
             }
             break;
             
@@ -297,52 +297,52 @@ static CGFloat const kTableViewCellMaxHeight = 70.0f;
             [UIView transitionWithView:self
                               duration:animated ? 0.2f : 0.0f
                                options:UIViewAnimationOptionTransitionCrossDissolve
-                            animations:
-             ^{
-                 if (self.selectedTextColor) {
-                     UIColor *textColor = isSelected ? self.selectedTextColor : self.textColor;
-                     self.textTitleLabel.textColor = textColor;
-                     self.imageTextTitleLabel.textColor = textColor;
-					 self.verticalImageTextTitleLabel.textColor = textColor;
-                 } else {
-                     self.textTitleLabel.textColor = self.textColor;
-                     self.imageTextTitleLabel.textColor = self.textColor;
-					 self.verticalImageTextTitleLabel.textColor = self.textColor;
-                 }
-                 
-                 if (self.selectedTextFont) {
-                     UIFont *textFont = isSelected ? self.selectedTextFont : self.textFont;
-                     self.textTitleLabel.font = textFont;
-                     self.imageTextTitleLabel.font = textFont;
-					 self.verticalImageTextTitleLabel.font = textFont;
-                 } else {
-                     self.textTitleLabel.font = self.textFont;
-                     self.imageTextTitleLabel.font = self.textFont;
-					 self.verticalImageTextTitleLabel.font = self.textFont;
-                 }
-                 
-                 if (self.selectedTabBackgroundColor) {
-                     self.backgroundColor = isSelected ? self.selectedTabBackgroundColor : self.tabBackgroundColor;
-                 } else {
-                     self.backgroundColor = self.tabBackgroundColor;
-                 }
-                 if (self.selectedTabBackgroundViewImage) {
-                     self.tabBackgroundView.image = isSelected ? self.selectedTabBackgroundViewImage : self.tabBackgroundViewImage;
-                 } else {
-                     self.tabBackgroundView.image = self.tabBackgroundViewImage;
-                 }
-				 
-				 if (self.highlightedImage) {
-					 self.verticalImageTextImageView.image = isSelected ? self.highlightedImage : self.image;
-				 }
-             } completion:nil];
+                            animations:^{
+                                if (self.selectedTextColor) {
+                                    UIColor *textColor = isSelected ? self.selectedTextColor : self.textColor;
+                                    self.textTitleLabel.textColor = textColor;
+                                    self.imageTextTitleLabel.textColor = textColor;
+                                    self.verticalImageTextTitleLabel.textColor = textColor;
+                                } else {
+                                    self.textTitleLabel.textColor = self.textColor;
+                                    self.imageTextTitleLabel.textColor = self.textColor;
+                                    self.verticalImageTextTitleLabel.textColor = self.textColor;
+                                }
+                
+                                if (self.selectedTextFont) {
+                                    UIFont *textFont = isSelected ? self.selectedTextFont : self.textFont;
+                                    self.textTitleLabel.font = textFont;
+                                    self.imageTextTitleLabel.font = textFont;
+                                    self.verticalImageTextTitleLabel.font = textFont;
+                                } else {
+                                    self.textTitleLabel.font = self.textFont;
+                                    self.imageTextTitleLabel.font = self.textFont;
+                                    self.verticalImageTextTitleLabel.font = self.textFont;
+                                }
+                
+                                if (self.selectedTabBackgroundColor) {
+                                    self.backgroundColor = isSelected ? self.selectedTabBackgroundColor : self.tabBackgroundColor;
+                                } else {
+                                    self.backgroundColor = self.tabBackgroundColor;
+                                }
+                                if (self.selectedTabBackgroundViewImage) {
+                                    self.tabBackgroundView.image = isSelected ? self.selectedTabBackgroundViewImage : self.tabBackgroundViewImage;
+                                } else {
+                                    self.tabBackgroundView.image = self.tabBackgroundViewImage;
+                                }
+                
+                                if (self.highlightedImage) {
+                                    self.verticalImageTextImageView.image = isSelected ? self.highlightedImage : self.image;
+                                }
+                            }
+                            completion:nil];
         }
         
         _isSelected = isSelected;
         self.selected = isSelected;
-		self.imageImageView.highlighted = isSelected;
-		self.imageTextImageView.highlighted = isSelected;
-		self.verticalImageTextImageView.highlighted = isSelected;
+        self.imageImageView.highlighted = isSelected;
+        self.imageTextImageView.highlighted = isSelected;
+        self.verticalImageTextImageView.highlighted = isSelected;
     }
 }
 

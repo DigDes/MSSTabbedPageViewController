@@ -45,8 +45,16 @@
  */
 @property (nonatomic, copy, nullable) NSString *title;
 
+/**
+ Additional text displayed in the tab cell.
+ 
+ NOTE - only visible when using MSSTabStyleText.
+ */
 @property (nonatomic, copy, nullable) NSString *detailText;
 
-+ (CGFloat)heightForText:(NSString *)aText detailText:(NSString *)detailText width:(CGFloat)width font:(UIFont *)font imageOffset:(CGFloat)imageOffset;
+/**
+ Calculates height for cell.
+ */
++ (CGFloat)heightForText:(nonnull NSString *)aText detailText:(nullable NSString *)detailText width:(CGFloat)width font:(nonnull UIFont *)font imageOffset:(CGFloat)imageOffset;
 
 @end

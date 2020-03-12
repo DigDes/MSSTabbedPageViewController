@@ -16,11 +16,14 @@ NSInteger const MSSViewDefaultZIndex = -1;
     [self mss_addExpandingSubview:subview edgeInsets:UIEdgeInsetsZero];
 }
 
-- (void)mss_addExpandingSubview:(UIView *)subview edgeInsets:(UIEdgeInsets)insets {
+- (void)mss_addExpandingSubview:(UIView *)subview
+                     edgeInsets:(UIEdgeInsets)insets {
     [self mss_addExpandingSubview:subview edgeInsets:insets atZIndex:MSSViewDefaultZIndex];
 }
 
-- (void)mss_addExpandingSubview:(UIView *)subview edgeInsets:(UIEdgeInsets)insets atZIndex:(NSInteger)index {
+- (void)mss_addExpandingSubview:(UIView *)subview
+                     edgeInsets:(UIEdgeInsets)insets
+                       atZIndex:(NSInteger)index {
     [self addView:subview atZIndex:index];
     NSDictionary *views = NSDictionaryOfVariableBindings(subview);
     
@@ -36,11 +39,12 @@ NSInteger const MSSViewDefaultZIndex = -1;
                                                                    views:views]];
 }
 
-- (void)mss_addPinnedToTopAndSidesSubview:(UIView *)subview withHeight:(CGFloat)height {
+- (void)mss_addPinnedToTopAndSidesSubview:(UIView *)subview
+                               withHeight:(CGFloat)height {
     [self addView:subview atZIndex:MSSViewDefaultZIndex];
     NSDictionary *views = NSDictionaryOfVariableBindings(subview);
     
-    NSDictionary *metrics = @{@"viewHeight":@(height)};
+    NSDictionary *metrics = @{@"viewHeight": @(height)};
     NSString *verticalConstraints = [NSString stringWithFormat:@"V:|-[subview(viewHeight)]"];
     NSString *horizontalConstraints = [NSString stringWithFormat:@"H:|-[subview]-|"];
     [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:verticalConstraints
@@ -63,7 +67,8 @@ NSInteger const MSSViewDefaultZIndex = -1;
 
 #pragma mark - Internal
 
-- (void)addView:(UIView *)subview atZIndex:(NSInteger)index {
+- (void)addView:(UIView *)subview
+       atZIndex:(NSInteger)index {
     if (subview.superview) {
         [subview removeFromSuperview];
     }

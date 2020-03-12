@@ -18,7 +18,7 @@ typedef NS_ENUM(NSInteger, MSSTabTransitionStyle) {
 };
 
 typedef NS_ENUM(NSInteger, MSSIndicatorStyle) {
-	MSSIndicatorDisabled = -1,
+    MSSIndicatorDisabled = -1,
     MSSIndicatorStyleLine,
     MSSIndicatorStyleImage
 };
@@ -26,6 +26,7 @@ typedef NS_ENUM(NSInteger, MSSIndicatorStyle) {
 extern CGFloat const MSSTabBarViewDefaultHeight;
 
 @class MSSTabBarView;
+
 @protocol MSSTabBarViewDataSource <NSObject>
 
 @required
@@ -101,11 +102,11 @@ __attribute__((deprecated("Use numberOfItemsForTabBarView and tabBarView:populat
 /**
  The object that acts as the data source for the tab bar.
  */
-@property (nonatomic, weak, nullable) IBOutlet id<MSSTabBarViewDataSource> dataSource;
+@property (nonatomic, weak, nullable) IBOutlet id <MSSTabBarViewDataSource> dataSource;
 /**
  The object that acts as a delegate for the tab bar.
  */
-@property (nonatomic, weak, nullable) IBOutlet id<MSSTabBarViewDelegate> delegate;
+@property (nonatomic, weak, nullable) IBOutlet id <MSSTabBarViewDelegate> delegate;
 
 /**
  The number of tabs in the tab bar.
@@ -243,6 +244,7 @@ __attribute__((deprecated("Use numberOfItemsForTabBarView and tabBarView:populat
  Animate the tab index transition.
  */
 - (void)setTabIndex:(NSInteger)index animated:(BOOL)animated;
+
 /**
  Set the data source of the tab bar.
  
@@ -251,7 +253,7 @@ __attribute__((deprecated("Use numberOfItemsForTabBarView and tabBarView:populat
  @param animated
  Animate the data source transition.
  */
-- (void)setDataSource:(nullable id<MSSTabBarViewDataSource>)dataSource animated:(BOOL)animated;
+- (void)setDataSource:(nullable id <MSSTabBarViewDataSource>)dataSource animated:(BOOL)animated;
 
 /**
  Set the tab and selection indicator transition style.
@@ -263,8 +265,8 @@ __attribute__((deprecated("Use numberOfItemsForTabBarView and tabBarView:populat
  */
 - (void)reloadData;
 
-- (void)deleteAndInsertTabsAtIndexPaths:(NSArray *)itemPaths;
+- (void)deleteAndInsertTabsAtIndexPaths:(nonnull NSArray *)itemPaths;
 
-- (MSSTabBarCollectionViewCell *)collectionViewCellAtTabIndex:(NSInteger)tabIndex;
+- (nullable MSSTabBarCollectionViewCell *)collectionViewCellAtTabIndex:(NSInteger)tabIndex;
 
 @end

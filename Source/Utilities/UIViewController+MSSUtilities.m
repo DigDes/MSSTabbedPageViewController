@@ -15,15 +15,19 @@
     [self mss_addToParentViewController:parentViewController atZIndex:MSSViewDefaultZIndex];
 }
 
-- (void)mss_addToParentViewController:(UIViewController *)parentViewController atZIndex:(NSInteger)index {
+- (void)mss_addToParentViewController:(UIViewController *)parentViewController
+                             atZIndex:(NSInteger)index {
     [self mss_addToParentViewController:parentViewController withView:parentViewController.view atZIndex:index];
 }
 
-- (void)mss_addToParentViewController:(UIViewController *)parentViewController withView:(UIView *)view {
+- (void)mss_addToParentViewController:(UIViewController *)parentViewController
+                             withView:(UIView *)view {
     [self mss_addToParentViewController:parentViewController withView:view atZIndex:MSSViewDefaultZIndex];
 }
 
-- (void)mss_addToParentViewController:(UIViewController *)parentViewController withView:(UIView *)view atZIndex:(NSInteger)index {
+- (void)mss_addToParentViewController:(UIViewController *)parentViewController
+                             withView:(UIView *)view
+                             atZIndex:(NSInteger)index {
     if (self.parentViewController) {
         [self.view removeFromSuperview];
         [self removeFromParentViewController];

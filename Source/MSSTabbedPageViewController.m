@@ -35,13 +35,16 @@
     self.automaticallyAdjustsScrollViewInsets = NO;
 }
 
-- (void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator {
+- (void)viewWillTransitionToSize:(CGSize)size
+       withTransitionCoordinator:(id <UIViewControllerTransitionCoordinator>)coordinator {
     [super viewWillTransitionToSize:size withTransitionCoordinator:coordinator];
-    [coordinator animateAlongsideTransitionInView:self.tabBarView animation:^(id<UIViewControllerTransitionCoordinatorContext>  _Nonnull context) {
+    [coordinator animateAlongsideTransitionInView:self.tabBarView
+                                        animation:^(id <UIViewControllerTransitionCoordinatorContext> _Nonnull context) {
         
-    } completion:^(id<UIViewControllerTransitionCoordinatorContext>  _Nonnull context) {
-        [self.tabBarView setTabOffset:self.tabBarView.tabOffset];
-    }];
+                                        }
+                                       completion:^(id <UIViewControllerTransitionCoordinatorContext> _Nonnull context) {
+                                           [self.tabBarView setTabOffset:self.tabBarView.tabOffset];
+                                       }];
 }
 
 #pragma mark - Tab bar data source
@@ -57,7 +60,8 @@
 }
 
 - (NSInteger)defaultTabIndexForTabBarView:(MSSTabBarView *)tabBarView {
-    if (self.pageViewController.currentPage == MSSPageViewControllerPageNumberInvalid) { // return default page if page has not been moved
+    if (self.pageViewController.currentPage ==
+        MSSPageViewControllerPageNumberInvalid) { // return default page if page has not been moved
         return self.pageViewController.defaultPageIndex;
     }
     return self.pageViewController.currentPage;
@@ -65,19 +69,22 @@
 
 #pragma mark - Tab bar delegate
 
-- (void)tabBarView:(MSSTabBarView *)tabBarView tabSelectedAtIndex:(NSInteger)index {
-    if (index != self.pageViewController.currentPage && !self.pageViewController.isAnimatingPageUpdate && index < self.pageViewController.viewControllers.count) {
+- (void)tabBarView:(MSSTabBarView *)tabBarView
+tabSelectedAtIndex:(NSInteger)index {
+    if (index != self.pageViewController.currentPage &&
+        !self.pageViewController.isAnimatingPageUpdate &&
+        index < self.pageViewController.viewControllers.count) {
         self.pageViewController.allowScrollViewUpdates = NO;
         self.pageViewController.userInteractionEnabled = NO;
         
         [self.tabBarView setTabIndex:index animated:YES];
         __weak __typeof(self) weakSelf = self;
         [self.pageViewController moveToPageAtIndex:index
-                     completion:^(UIViewController *newViewController, BOOL animated, BOOL transitionFinished) {
-                         __strong __typeof(weakSelf) strongSelf = weakSelf;
-                         strongSelf.pageViewController.allowScrollViewUpdates = YES;
-                         strongSelf.pageViewController.userInteractionEnabled = YES;
-                     }];
+                                        completion:^(UIViewController *newViewController, BOOL animated, BOOL transitionFinished) {
+                                            __strong __typeof(weakSelf) strongSelf = weakSelf;
+                                            strongSelf.pageViewController.allowScrollViewUpdates = YES;
+                                            strongSelf.pageViewController.userInteractionEnabled = YES;
+                                        }];
     }
 }
 
@@ -105,20 +112,22 @@
 #pragma mark - Navigation Controller delegate
 
 #if !defined(MSS_APP_EXTENSIONS)
+
 - (void)navigationController:(UINavigationController *)navigationController
       willShowViewController:(UIViewController *)viewController
                     animated:(BOOL)animated {
     
     // Fix for navigation controller swipe back gesture
     // Manually set tab bar to hidden if gesture was cancelled
-    id<UIViewControllerTransitionCoordinator> transitionCoordinator = navigationController.topViewController.transitionCoordinator;
-    [transitionCoordinator notifyWhenInteractionEndsUsingBlock:^(id<UIViewControllerTransitionCoordinatorContext> context) {
+    id <UIViewControllerTransitionCoordinator> transitionCoordinator = navigationController.topViewController.transitionCoordinator;
+    [transitionCoordinator notifyWhenInteractionEndsUsingBlock:^(id <UIViewControllerTransitionCoordinatorContext> context) {
         if ([context isCancelled] && self.allowTabBarRequiredCancellation) {
             self.tabNavigationBar.tabBarRequired = NO;
             [self.tabNavigationBar setNeedsLayout];
         }
     }];
 }
+
 #endif
 
 @end

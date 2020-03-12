@@ -22,7 +22,8 @@
 
 @property (nonatomic, assign) CGFloat selectionProgress;
 
-- (void)setSelectionProgress:(CGFloat)selectionProgress animated:(BOOL)animated;
+- (void)setSelectionProgress:(CGFloat)selectionProgress
+                    animated:(BOOL)animated;
 
 @property (nonatomic, assign) BOOL alphaEffectEnabled;
 
