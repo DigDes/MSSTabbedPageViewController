@@ -19,6 +19,13 @@
  The style of the tab.
  */
 @property (nonatomic, assign, readonly) MSSTabStyle tabStyle;
+
+@property (nonatomic, strong, nullable) UIImage *selectedTabBackgroundViewImage;
+
+@property (nonatomic, strong, nullable) UIImage *tabBackgroundViewImage;
+
+@property (nonatomic) CGFloat tabAlpha;
+
 /**
  The image displayed in the tab cell.
  
@@ -40,6 +47,6 @@
 
 @property (nonatomic, copy, nullable) NSString *detailText;
 
-+ (CGFloat)heightForText:(NSString *)aText detailText:(NSString *)detailText width:(CGFloat)width font:(UIFont *)font;
++ (CGFloat)heightForText:(NSString *)aText detailText:(NSString *)detailText width:(CGFloat)width font:(UIFont *)font imageOffset:(CGFloat)imageOffset;
 
 @end

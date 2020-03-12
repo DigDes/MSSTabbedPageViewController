@@ -105,6 +105,7 @@ defaultPageIndex = _defaultPageIndex;
 	[self.pageViewController mss_addToParentViewController:self atZIndex:0];
 	self.scrollEnabled = _isScrollEnabled;
 	self.scrollView.delegate = self;
+	[self.scrollView.panGestureRecognizer requireGestureRecognizerToFail:self.navigationController.interactivePopGestureRecognizer];
 	
 	[self setUpPages];
 }

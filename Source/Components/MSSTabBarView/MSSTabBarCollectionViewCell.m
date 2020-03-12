@@ -24,6 +24,7 @@
 @property (nonatomic, weak) IBOutlet UIView *imageTextContainerView;
 @property (nonatomic, weak) IBOutlet UILabel *imageTextTitleLabel;
 @property (nonatomic, weak) IBOutlet UIImageView *imageTextImageView;
+@property (nonatomic, weak) IBOutlet UIImageView *tabBackgroundView;
 
 @property (nonatomic, weak) IBOutlet UIView *verticalImageTextContainerView;
 @property (nonatomic, weak) IBOutlet UILabel *verticalImageTextTitleLabel;
@@ -66,8 +67,8 @@
 #pragma mark - Public
 
 - (void)setTitle:(NSString *)title {
-    self.textTitleLabel.text = title;
-    self.imageTextTitleLabel.text = title;
+	self.textTitleLabel.text = title;
+	self.imageTextTitleLabel.text = title;
 	self.verticalImageTextTitleLabel.text = title;
 }
 
@@ -103,28 +104,35 @@
 	if (self.tabStyle == MSSTabStyleImage || self.tabStyle == MSSTabStyleImageAndText) {
 		self.imageImageView.highlightedImage = highlightedImage;
 		self.imageTextImageView.highlightedImage = highlightedImage;
-		self.verticalImageTextImageView.highlightedImage = highlightedImage;
 	}
+}
+
+- (CGFloat)tabAlpha {
+	return self.textTitleLabel.alpha;
+}
+
+- (void)setTabAlpha:(CGFloat)tabAlpha {
+	self.textTitleLabel.alpha = tabAlpha;
+	self.imageTextTitleLabel.alpha = tabAlpha;
+	self.verticalImageTextTitleLabel.alpha = tabAlpha;
+	self.imageImageView.alpha = tabAlpha;
+	self.imageTextImageView.alpha = tabAlpha;
+	self.verticalImageTextImageView.alpha = tabAlpha;
 }
 
 static CGFloat const kTableViewCellMinHeight = 44.0f;
 static CGFloat const kTableViewCellMaxHeight = 70.0f;
 
-+ (CGFloat)heightForText:(NSString *)aText detailText:(NSString *)detailText width:(CGFloat)width font:(UIFont *)font {
++ (CGFloat)heightForText:(NSString *)aText detailText:(NSString *)detailText width:(CGFloat)width font:(UIFont *)font imageOffset:(CGFloat)imageOffset{
 	NSMutableParagraphStyle *paragraphStyle = [[NSMutableParagraphStyle alloc] init];
 	paragraphStyle.lineBreakMode = NSLineBreakByWordWrapping;
 	
 	NSDictionary *attributes = @{NSFontAttributeName: font, NSParagraphStyleAttributeName: paragraphStyle};
 	
-	CGFloat imageOffset = 44.0f;
-	
-//	if ([AppSettings instance].customerSpecificSettingsMPT && ![AppSettings instance].customerSpecificSettingsMPT_Minister) {
-//		imageOffset = 49.0f;
-//	}
 	CGRect rect = [aText boundingRectWithSize:CGSizeMake(width - imageOffset, MAXFLOAT)
-									  options:NSStringDrawingUsesLineFragmentOrigin
-								   attributes:attributes
-									  context:nil];
+						 options:NSStringDrawingUsesLineFragmentOrigin
+						 attributes:attributes
+						 context:nil];
 	if (detailText.length > 0) {
 		if (CGRectGetHeight(rect) < 22.0f) {
 			return kTableViewCellMinHeight;
@@ -232,6 +240,15 @@ static CGFloat const kTableViewCellMaxHeight = 70.0f;
     }
 }
 
+- (void)setTabBackgroundViewImage:(UIImage *)tabBackgroundViewImage {
+    _tabBackgroundViewImage = tabBackgroundViewImage;
+    self.tabBackgroundView.image = self.tabBackgroundViewImage;
+}
+
+- (void)setSelectedTabBackgroundViewImage:(UIImage *)selectedTabBackgroundViewImage {
+    _selectedTabBackgroundViewImage = selectedTabBackgroundViewImage;
+}
+
 - (void)setSelectionProgress:(CGFloat)selectionProgress {
 	[self setSelectionProgress:selectionProgress animated:YES];
 }
@@ -309,6 +326,15 @@ static CGFloat const kTableViewCellMaxHeight = 70.0f;
                  } else {
                      self.backgroundColor = self.tabBackgroundColor;
                  }
+                 if (self.selectedTabBackgroundViewImage) {
+                     self.tabBackgroundView.image = isSelected ? self.selectedTabBackgroundViewImage : self.tabBackgroundViewImage;
+                 } else {
+                     self.tabBackgroundView.image = self.tabBackgroundViewImage;
+                 }
+				 
+				 if (self.highlightedImage) {
+					 self.verticalImageTextImageView.image = isSelected ? self.highlightedImage : self.image;
+				 }
              } completion:nil];
         }
         
