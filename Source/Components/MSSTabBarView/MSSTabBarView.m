@@ -447,6 +447,9 @@ didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
 }
 
 - (void)setAxis:(UILayoutConstraintAxis)axis {
+    if (_axis == axis) {
+        return;
+    }
     _axis = axis;
     self.indicatorContainer.hidden = _axis == UILayoutConstraintAxisVertical;
     self.separatorView.hidden = _axis == UILayoutConstraintAxisVertical;
