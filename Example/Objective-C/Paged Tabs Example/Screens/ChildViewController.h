@@ -7,10 +7,9 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "MSSTabbedPageViewController.h"
 
-@interface ChildViewController : UIViewController
-
-@property (nonatomic, weak) IBOutlet UILabel *titleLabel;
+@interface ChildViewController : UIViewController {
+    __weak IBOutlet UILabel *_titleLabel;
+}
 
 @end

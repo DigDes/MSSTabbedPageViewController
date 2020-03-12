@@ -1,11 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="13168.3" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="PnR-mV-E6n">
-    <device id="retina4_7" orientation="portrait">
-        <adaptation id="fullscreen"/>
-    </device>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="15705" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="PnR-mV-E6n">
+    <device id="retina5_5" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="13147.4"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="15706"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -18,11 +16,11 @@
                         <viewControllerLayoutGuide type="bottom" id="wfy-db-euE"/>
                     </layoutGuides>
                     <view key="view" contentMode="scaleToFill" id="8bC-Xf-vdC">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="736"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Page X" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="pjY-bc-PW7">
-                                <rect key="frame" x="157.5" y="321.5" width="60" height="24"/>
+                                <rect key="frame" x="177" y="356" width="60" height="24"/>
                                 <fontDescription key="fontDescription" type="system" weight="light" pointSize="20"/>
                                 <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <nil key="highlightedColor"/>
@@ -34,7 +32,7 @@
                         </constraints>
                     </view>
                     <connections>
-                        <outlet property="titleLabel" destination="pjY-bc-PW7" id="wQd-KN-rzk"/>
+                        <outlet property="_titleLabel" destination="pjY-bc-PW7" id="foj-fR-UoK"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
@@ -46,7 +44,7 @@
             <objects>
                 <navigationController id="PnR-mV-E6n" sceneMemberID="viewController">
                     <navigationBar key="navigationBar" contentMode="scaleToFill" id="tJO-Jo-WH6" customClass="MSSTabNavigationBar">
-                        <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="44"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
                     <connections>
@@ -66,7 +64,7 @@
                         <viewControllerLayoutGuide type="bottom" id="f4L-I6-hqw"/>
                     </layoutGuides>
                     <view key="view" contentMode="scaleToFill" id="R6r-h9-cLP">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="716"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                     </view>
@@ -85,11 +83,11 @@
                         <viewControllerLayoutGuide type="bottom" id="BTu-pM-MMd"/>
                     </layoutGuides>
                     <view key="view" contentMode="scaleToFill" id="soB-l3-j58">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="716"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="J0c-gz-YJt">
-                                <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                                <rect key="frame" x="0.0" y="0.0" width="414" height="716"/>
                                 <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <connections>
                                     <outlet property="dataSource" destination="XHJ-ZZ-Ryp" id="SAo-Qk-J4y"/>
@@ -131,11 +129,11 @@
                         <viewControllerLayoutGuide type="bottom" id="w7p-0t-sTk"/>
                     </layoutGuides>
                     <view key="view" contentMode="scaleToFill" id="dNZ-yt-JE0">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="736"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="qGY-SQ-R5H">
-                                <rect key="frame" x="0.0" y="64" width="375" height="603"/>
+                                <rect key="frame" x="0.0" y="44" width="414" height="50"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="50" id="Nw1-Wr-Tgq"/>
@@ -154,10 +152,10 @@
                                 </variation>
                             </view>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="3Ep-5g-C9H">
-                                <rect key="frame" x="0.0" y="64" width="375" height="603"/>
+                                <rect key="frame" x="0.0" y="94" width="414" height="642"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                             </view>
-                            <button opaque="NO" contentMode="left" contentHorizontalAlignment="left" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="rsd-eI-CJS" userLabel="Splitter Button" customClass="EWStatesButton">
+                            <button opaque="NO" contentMode="left" contentHorizontalAlignment="left" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="rsd-eI-CJS" userLabel="Splitter Button">
                                 <rect key="frame" x="320" y="182" width="44" height="50"/>
                                 <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="0.0" colorSpace="custom" customColorSpace="sRGB"/>
                                 <gestureRecognizers/>
@@ -175,14 +173,14 @@
                             <constraint firstItem="3Ep-5g-C9H" firstAttribute="leading" secondItem="qGY-SQ-R5H" secondAttribute="trailing" id="7nC-9Y-f2i"/>
                             <constraint firstItem="qGY-SQ-R5H" firstAttribute="leading" secondItem="dNZ-yt-JE0" secondAttribute="leading" id="E5b-Ml-ShA"/>
                             <constraint firstItem="qGY-SQ-R5H" firstAttribute="top" secondItem="hrX-NP-I6C" secondAttribute="bottom" id="Rp8-XA-n37"/>
-                            <constraint firstItem="w7p-0t-sTk" firstAttribute="top" secondItem="qGY-SQ-R5H" secondAttribute="bottom" id="Urz-MN-W9S"/>
+                            <constraint firstItem="qGY-SQ-R5H" firstAttribute="bottom" secondItem="w7p-0t-sTk" secondAttribute="top" id="Urz-MN-W9S"/>
                             <constraint firstAttribute="trailing" secondItem="3Ep-5g-C9H" secondAttribute="trailing" id="aeh-ZR-PBa"/>
                             <constraint firstItem="rsd-eI-CJS" firstAttribute="centerY" secondItem="dNZ-yt-JE0" secondAttribute="centerY" id="b4W-yh-nsh"/>
                             <constraint firstItem="3Ep-5g-C9H" firstAttribute="leading" secondItem="dNZ-yt-JE0" secondAttribute="leading" id="bsI-zP-5vd"/>
                             <constraint firstItem="3Ep-5g-C9H" firstAttribute="top" secondItem="hrX-NP-I6C" secondAttribute="bottom" id="dsf-n8-RHr"/>
                             <constraint firstAttribute="trailing" secondItem="qGY-SQ-R5H" secondAttribute="trailing" id="nmq-Mt-BFw"/>
                             <constraint firstItem="rsd-eI-CJS" firstAttribute="leading" secondItem="3Ep-5g-C9H" secondAttribute="leading" id="uXH-Ct-8kh"/>
-                            <constraint firstItem="w7p-0t-sTk" firstAttribute="top" secondItem="3Ep-5g-C9H" secondAttribute="bottom" id="yPo-QA-aSP"/>
+                            <constraint firstItem="3Ep-5g-C9H" firstAttribute="bottom" secondItem="w7p-0t-sTk" secondAttribute="top" id="yPo-QA-aSP"/>
                             <constraint firstItem="3Ep-5g-C9H" firstAttribute="top" secondItem="qGY-SQ-R5H" secondAttribute="bottom" id="zP5-bb-i3N"/>
                         </constraints>
                         <variation key="default">
@@ -191,6 +189,8 @@
                             </mask>
                             <mask key="constraints">
                                 <exclude reference="7nC-9Y-f2i"/>
+                                <exclude reference="dsf-n8-RHr"/>
+                                <exclude reference="Urz-MN-W9S"/>
                             </mask>
                         </variation>
                         <variation key="widthClass=regular">
@@ -198,10 +198,12 @@
                                 <include reference="rsd-eI-CJS"/>
                             </mask>
                             <mask key="constraints">
-                                <exclude reference="nmq-Mt-BFw"/>
                                 <include reference="7nC-9Y-f2i"/>
                                 <exclude reference="bsI-zP-5vd"/>
+                                <include reference="dsf-n8-RHr"/>
                                 <exclude reference="zP5-bb-i3N"/>
+                                <include reference="Urz-MN-W9S"/>
+                                <exclude reference="nmq-Mt-BFw"/>
                             </mask>
                         </variation>
                     </view>
@@ -221,7 +223,7 @@
             <objects>
                 <navigationController id="HEl-GH-SEE" sceneMemberID="viewController">
                     <navigationBar key="navigationBar" contentMode="scaleToFill" id="Uwu-Hp-A3k" customClass="MSSTabNavigationBar">
-                        <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="56"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
                     <connections>
