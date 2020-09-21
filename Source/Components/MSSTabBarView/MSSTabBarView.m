@@ -894,6 +894,9 @@ static CGFloat const MSSTabBarViewTabOffsetInvalid = -1.0f;
 	CGSize requiredSize = [self.sizingCell systemLayoutSizeFittingSize:fittingSize
 										   withHorizontalFittingPriority:UILayoutPriorityFittingSizeLevel
 										   verticalFittingPriority:UILayoutPriorityRequired];
+	if (requiredSize.width == 0.0f) {
+		requiredSize.width = self.sizingCell.frame.size.width;
+	}
 	requiredSize.width += self.tabPadding;
 	return requiredSize;
 }
