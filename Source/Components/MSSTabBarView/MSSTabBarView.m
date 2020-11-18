@@ -27,7 +27,7 @@ static CGFloat const MSSTabBarViewDefaultTabIndicatorHeight = 2.0f;
 static CGFloat const MSSTabBarViewDefaultTabPadding = 8.0f;
 static CGFloat const MSSTabBarViewDefaultTabUnselectedAlpha = 0.3f;
 static CGFloat const MSSTabBarViewDefaultHorizontalContentInset = 8.0f;
-static NSString *const MSSTabBarViewDefaultTabTitleFormat = @"Tab %li";
+static NSString *const MSSTabBarViewDefaultTabTitle = @"";
 static BOOL const MSSTabBarViewDefaultScrollEnabled = YES;
 
 static NSInteger const MSSTabBarViewDefaultMaxDistributedTabs = 5;
@@ -904,7 +904,7 @@ didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
     if (self.tabTitles) {
         return self.tabTitles[index];
     } else {
-        return [NSString stringWithFormat:MSSTabBarViewDefaultTabTitleFormat, (long) (index + 1)];
+        return MSSTabBarViewDefaultTabTitle;
     }
 }
 
